@@ -19,11 +19,24 @@
          -moz-box-shadow: 0 10px 6px -6px #777;
               box-shadow: 0 10px 6px -6px #777;
     }
+    .submit {
+      width: 98%;
+      font-size: 24px;
+      background: #dddddd;
+      border: none;
+    }
   </style>
+  <script>
+    function send(form) {
+      config = {};
+      window.location.href = "pebblejs://close#"+JSON.stringify(config);
+      return false;
+    }
+  </script>
 </head>
 <body>
-  <h1>Weather Watch Configuration</h1>
-  <div class="cards">
+  <h1>Weather Watch</h1>
+  <form onsubmit="return send(this);">
     <div class="card">
     </div>
     <div class="card">
@@ -33,7 +46,9 @@
     <div class="card">
     </div>
     <div class="card">
+
     </div>
-  </div>
+    <input type="submit" id="submit" value="Save Settings" class="submit card">
+</form>
 </body>
 </html>
