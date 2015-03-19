@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
   <title>Configuration</title>
   <style>
     body {
@@ -12,6 +13,7 @@
     }
     .card {
       background: #ffffff;
+      font-size: 24px;
       margin: 10px 5px 5px 5px;
       border-radius: 2px;
       min-height: 40px;
@@ -25,19 +27,54 @@
       background: #dddddd;
       border: none;
     }
+    .label {
+      width: 40%;
+      font-size: 24px;
+      float: left;
+      text-align: right;
+      padding-top: 5px;
+      padding-right: 10px;
+    }
+    .input {
+      float: left;
+      padding-top: 3px;
+    }
   </style>
   <script>
     function send(form) {
       config = {};
-      window.location.href = "pebblejs://close#"+JSON.stringify(config);
+      var stuff = '';
+      try {
+      for (var i in form) {
+        var element = form[i];
+        if (element) {
+          var name = element.name;
+          if (element.id) {
+            stuff += '' + i + ' : ' + element.id + ' (' + name + ') => ' + element.value + '\n';
+          }
+        }
+      }
+      alert(stuff);
+    } catch (e) {
+      alert(e);
+    }
+      //window.location.href = "pebblejs://close#"+JSON.stringify(config);
       return false;
     }
   </script>
 </head>
 <body>
   <h1>Weather Watch</h1>
-  <form onsubmit="return send(this);">
     <div class="card">
+      <div class="label">
+        Temp Unit:
+      </div>
+      <div class="input">
+        <select id="temperatureUnit">
+          <option value="c">&deg;C</option>
+          <option value="f">&deg;F</option>
+        </select>
+      </div>
     </div>
     <div class="card">
     </div>
@@ -48,7 +85,20 @@
     <div class="card">
 
     </div>
-    <input type="submit" id="submit" value="Save Settings" class="submit card">
-</form>
+    <button type="submit" id="submit" class="submit card">Save Settings</button>
+  <script>
+    $().ready(function() {
+    });
+    $('#submit').click(function() {
+      var config = {};
+      if ($('#temperatureUnit').val() == 'c') {
+        config.temperatureUnit = 0;
+      } else {
+        config.temperatureUnit = 1;
+      }
+      var options = encodeURIComponent(JSON.stringify(config));
+      window.location.href = "pebblejs://close#" + options;
+    });
+  </script>
 </body>
 </html>
