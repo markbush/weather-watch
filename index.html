@@ -97,7 +97,7 @@
     });
     $('#submit').click(function() {
       var config = {};
-      config.temperatureUnit = $('#temperatureUnit').val();
+      config.temperatureUnit = $('#temperatureUnit').val() - 0;
       var store = JSON.stringify(config);
       var options = encodeURIComponent(store);
       if (typeof window.localStorage !== "undefined") {
