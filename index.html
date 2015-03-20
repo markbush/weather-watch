@@ -71,8 +71,8 @@
       </div>
       <div class="input">
         <select id="temperatureUnit">
-          <option value="c">&deg;C</option>
-          <option value="f">&deg;F</option>
+          <option value="0">&deg;C</option>
+          <option value="1">&deg;F</option>
         </select>
       </div>
     </div>
@@ -88,15 +88,21 @@
     <button type="submit" id="submit" class="submit card">Save Settings</button>
   <script>
     $().ready(function() {
+      if (typeof window.localStorage !== "undefined") {
+        if (window.localStorage.weatherWatch) {
+          var config = JSON.parse(window.localStorage.weatherWatch);
+          $('#temperatureUnit').val(config.temperatureUnit);
+        }
+      }
     });
     $('#submit').click(function() {
       var config = {};
-      if ($('#temperatureUnit').val() == 'c') {
-        config.temperatureUnit = 0;
-      } else {
-        config.temperatureUnit = 1;
+      config.temperatureUnit = $('#temperatureUnit').val();
+      var store = JSON.stringify(config);
+      var options = encodeURIComponent(store);
+      if (typeof window.localStorage !== "undefined") {
+        window.localStorage.weatherWatch = store;
       }
-      var options = encodeURIComponent(JSON.stringify(config));
       window.location.href = "pebblejs://close#" + options;
     });
   </script>
