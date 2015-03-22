@@ -13,7 +13,7 @@
     }
     .card {
       background: #ffffff;
-      font-size: 24px;
+      font-size: 20px;
       margin: 10px 5px 5px 5px;
       border-radius: 2px;
       min-height: 40px;
@@ -22,13 +22,16 @@
               box-shadow: 0 10px 6px -6px #777;
     }
     .submit {
-      width: 98%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
       font-size: 24px;
       background: #dddddd;
       border: none;
+      border-radius: 3px;
     }
     .label {
-      width: 40%;
+      width: 50%;
       font-size: 24px;
       float: left;
       text-align: right;
@@ -40,28 +43,6 @@
       padding-top: 3px;
     }
   </style>
-  <script>
-    function send(form) {
-      config = {};
-      var stuff = '';
-      try {
-      for (var i in form) {
-        var element = form[i];
-        if (element) {
-          var name = element.name;
-          if (element.id) {
-            stuff += '' + i + ' : ' + element.id + ' (' + name + ') => ' + element.value + '\n';
-          }
-        }
-      }
-      alert(stuff);
-    } catch (e) {
-      alert(e);
-    }
-      //window.location.href = "pebblejs://close#"+JSON.stringify(config);
-      return false;
-    }
-  </script>
 </head>
 <body>
   <h1>Weather Watch</h1>
@@ -77,27 +58,46 @@
       </div>
     </div>
     <div class="card">
+      <div class="label">
+        Show Battery:
+      </div>
+      <div class="input">
+        <select id="battery">
+          <option value="0">Always</option>
+          <option value="1">When %lt;=90%</option>
+          <option value="2">When %lt;=90%</option>
+          <option value="3">When %lt;=90%</option>
+          <option value="4">When %lt;=90%</option>
+          <option value="5">When %lt;=90%</option>
+          <option value="6">When %lt;=90%</option>
+          <option value="7">When %lt;=90%</option>
+          <option value="8">When %lt;=90%</option>
+          <option value="9">When %lt;=90%</option>
+          <option value="10">When charging</option>
+        </select>
+      </div>
     </div>
     <div class="card">
     </div>
     <div class="card">
     </div>
     <div class="card">
-
+      <button type="submit" id="submit" class="submit card">Save Settings</button>
     </div>
-    <button type="submit" id="submit" class="submit card">Save Settings</button>
   <script>
     $().ready(function() {
       if (typeof window.localStorage !== "undefined") {
         if (window.localStorage.weatherWatch) {
           var config = JSON.parse(window.localStorage.weatherWatch);
           $('#temperatureUnit').val(config.temperatureUnit);
+          $('#battery').val(config.battery);
         }
       }
     });
     $('#submit').click(function() {
       var config = {};
       config.temperatureUnit = $('#temperatureUnit').val() - 0;
+      config.battery = $('#battery').val() - 0;
       var store = JSON.stringify(config);
       var options = encodeURIComponent(store);
       if (typeof window.localStorage !== "undefined") {
