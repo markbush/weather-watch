@@ -2,15 +2,27 @@
 
 #define KEY_TEMPERATURE 0
 #define KEY_CONDITIONS 1
+#define KEY_TEMP_UNIT 2
+#define KEY_BATTERY 3
+#define KEY_BLUETOOTH 4
+#define KEY_DISCONNECT 5
 
 extern void update_weather_conditions_display(uint32_t weather_state);
-extern void update_weather_temperature_display(int temperature);
+extern void update_weather_temperature_display();
+extern void use_temperature_unit(uint32_t temperature_unit);
+extern void update_battery();
+extern void update_bluetooth();
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void inbox_dropped_callback(AppMessageResult reason, void *context);
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context);
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context);
 static uint32_t weather_state_for_conditions(uint32_t conditions);
+
+extern int s_temperature;
+extern int s_battery_showing;
+extern int s_bluetooth_showing;
+extern int s_bluetooth_disconnect;
 
 void setup_weather_service() {
   app_message_register_inbox_received(inbox_received_callback);
@@ -31,12 +43,32 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Which key was received?
     switch(t->key) {
     case KEY_TEMPERATURE:
-      update_weather_temperature_display((int)t->value->int32);
+      ;
+      s_temperature = (int)t->value->int32;
+      update_weather_temperature_display();
       break;
     case KEY_CONDITIONS:
       ;
       uint32_t weather_state = weather_state_for_conditions((uint32_t)t->value->int32);
       update_weather_conditions_display(weather_state);
+      break;
+    case KEY_TEMP_UNIT:
+      use_temperature_unit((uint32_t)t->value->int32);
+      update_weather_temperature_display();
+      break;
+    case KEY_BATTERY:
+      ;
+      s_battery_showing = (int)t->value->int32;
+      update_battery();
+      break;
+    case KEY_BLUETOOTH:
+      ;
+      s_bluetooth_showing = (int)t->value->int32;
+      update_bluetooth();
+      break;
+    case KEY_DISCONNECT:
+      ;
+      s_bluetooth_disconnect = (int)t->value->int32;
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);

@@ -1,10 +1,15 @@
 {
     "appKeys": {
-        "KEY_CONDITIONS": 1,
-        "KEY_TEMPERATURE": 0
+        "battery": 3,
+        "bluetooth": 4,
+        "conditions": 1,
+        "disconnect": 5,
+        "temperature": 0,
+        "temperatureUnit": 2
     },
     "capabilities": [
-        "location"
+        "location",
+        "configurable"
     ],
     "companyName": "Mark Bush",
     "longName": "Weather Watch",

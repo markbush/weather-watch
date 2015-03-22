@@ -4,11 +4,26 @@
 #define BATTERY_CHARGED  254
 #define BATTERY_UNKNOWN  255
 
+#define SHOW_ALWAYS 0
+#define SHOW_IF_NOT_GREATER_90 1
+#define SHOW_IF_NOT_GREATER_80 2
+#define SHOW_IF_NOT_GREATER_70 3
+#define SHOW_IF_NOT_GREATER_60 4
+#define SHOW_IF_NOT_GREATER_50 5
+#define SHOW_IF_NOT_GREATER_40 6
+#define SHOW_IF_NOT_GREATER_30 7
+#define SHOW_IF_NOT_GREATER_20 8
+#define SHOW_IF_NOT_GREATER_10 9
+#define SHOW_CHARGING 10
+#define SHOW_NEVER 11
+
 static void battery_update_proc(Layer *layer, GContext *ctx);
 static void battery_changed_callback(BatteryChargeState charge_state);
+void update_battery();
 
 static Layer *s_battery_layer;
-static uint8_t s_battery_state = BATTERY_UNKNOWN;
+static int s_battery_state = BATTERY_UNKNOWN;
+int s_battery_showing = SHOW_ALWAYS;
 
 static GPath *s_battery_path;
 static const GPathInfo BATTERY_ICON = {
@@ -101,11 +116,44 @@ static void battery_changed_callback(BatteryChargeState charge_state) {
   } else if (charge_state.charge_percent >= 90) {
     battery_state = 100;
   } else {
-    battery_state = charge_state.charge_percent;
+    battery_state = (int)charge_state.charge_percent;
   }
 
   if (battery_state != s_battery_state) {
     s_battery_state = battery_state;
+    update_battery();
     layer_mark_dirty(s_battery_layer);
   }
+}
+
+void update_battery() {
+  bool hidden = false;
+  switch (s_battery_showing) {
+  case SHOW_NEVER:
+    ;
+    hidden = true;
+    break;
+  case SHOW_CHARGING:
+    ;
+    if (s_battery_state == BATTERY_CHARGING || s_battery_state == BATTERY_CHARGED) {
+      hidden = false;
+    } else {
+      hidden = true;
+    }
+    break;
+  case SHOW_ALWAYS:
+    ;
+    hidden = false;
+    break;
+  default:
+    ;
+    int check_level = (10 - s_battery_showing) * 10;
+    if (s_battery_state <= check_level) {
+      hidden = false;
+    } else {
+      hidden = true;
+    }
+    break;
+  }
+  layer_set_hidden(s_battery_layer, hidden);
 }

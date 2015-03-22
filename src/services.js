@@ -7,12 +7,16 @@ var xhrRequest = function (url, type, callback) {
   xhr.send();
 };
 
+var config_url = 'http://markbush.github.io/weather-watch/';
+var config = {};
+
 function locationSuccess(pos) {
   // Construct URL
   var url = "http://api.openweathermap.org/data/2.5/weather?lat=" +
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
+  //console.log("URL: " + url);
   xhrRequest(url, 'GET', 
     function(responseText) {
       // responseText contains a JSON object with weather info
@@ -29,14 +33,14 @@ function locationSuccess(pos) {
 
       // Assemble dictionary using our keys
       var dictionary = {
-        "KEY_TEMPERATURE": temperature,
-        "KEY_CONDITIONS": conditions
+        "temperature": temperature,
+        "conditions": conditions
       };
 
       // Send to Pebble
       Pebble.sendAppMessage(dictionary,
         function(e) {
-          //console.log("Weather info sent to Pebble successfully!");
+          //console.log("Weather info: " + json.main.temp + "(" + temperature + ")" + " " + conditions);
         },
         function(e) {
           console.log("Error sending weather info to Pebble!");
@@ -75,3 +79,21 @@ Pebble.addEventListener('appmessage',
     getWeather();
   }                     
 );
+
+Pebble.addEventListener("showConfiguration", function(e) {
+    Pebble.openURL(config_url);
+});
+
+Pebble.addEventListener('webviewclosed', function (e) {
+  console.log("Config result: " + e.response);
+
+    if ((typeof e.response === 'string') && (e.response.length > 0)) {
+        config = JSON.parse(e.response);
+
+        // Store it locally
+        window.localStorage.setItem('weatherWatch', e.response);
+
+        // And send it to Pebble
+        Pebble.sendAppMessage(config);
+    }
+});

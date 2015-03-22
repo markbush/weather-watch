@@ -10,9 +10,9 @@ Layer *s_hands_layer;
 static GPath *s_minute_hand_path;
 static const GPathInfo MINUTE_HAND = {
     3, (GPoint []){
-        {-4, -55},
+        {-2, -55},
         {0, -64},
-        {4, -55}
+        {2, -55}
     }
 };
 static GPath *s_hour_hand_path;

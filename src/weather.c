@@ -1,12 +1,18 @@
 #include <pebble.h>
 
+#define CELSIUS 0
+#define FAHRENHEIT 1
+
 void update_weather_conditions_display(uint32_t weather_state);
-void update_weather_temperature_display(int temperature);
+void update_weather_temperature_display();
+void use_temperature_unit(uint32_t temperature_unit);
 
 uint32_t s_weather_state = RESOURCE_ID_IMAGE_ALERT;
 static BitmapLayer *s_conditions_layer;
 static TextLayer *s_temperature_layer;
 static GBitmap *s_conditions_bitmap;
+int s_temperature = 0;
+static uint32_t s_temperature_unit = CELSIUS;
 
 void setup_weather(Layer *root) {
   // Create temperature Layer
@@ -41,9 +47,18 @@ void update_weather_conditions_display(uint32_t weather_state) {
   }  
 }
 
-void update_weather_temperature_display(int temperature) {
+void update_weather_temperature_display() {
   static char temperature_buffer[8];
 
-  snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", temperature);
+  if (s_temperature_unit == CELSIUS) {
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", s_temperature);
+  } else {
+    int temperature = (s_temperature * 9 / 5) + 32;
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
+  }
   text_layer_set_text(s_temperature_layer, temperature_buffer);
+}
+
+void use_temperature_unit(uint32_t temperature_unit) {
+  s_temperature_unit = temperature_unit;
 }
