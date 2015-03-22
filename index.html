@@ -73,14 +73,34 @@
           <option value="7">When &lt;=30%</option>
           <option value="8">When &lt;=20%</option>
           <option value="9">When &lt;=10%</option>
-          <option value="10">When charging</option>
+          <option value="10">When Charging</option>
           <option value="11">Never</option>
         </select>
       </div>
     </div>
     <div class="card">
+      <div class="label">
+        BT Indicator:
+      </div>
+      <div class="input">
+        <select id="bluetooth">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
     </div>
     <div class="card">
+      <div class="label">
+        BT Disconnect:
+      </div>
+      <div class="input">
+        <select id="disconnect">
+          <option value="0">No Action</option>
+          <option value="1">Short Pulse</option>
+          <option value="2">Long Pulse</option>
+          <option value="3">Double Pulse</option>
+        </select>
+      </div>
     </div>
     <div class="card">
       <button type="submit" id="submit" class="submit card">Save Settings</button>
@@ -92,8 +112,12 @@
           var config = JSON.parse(window.localStorage.weatherWatch);
           if (!config.temperatureUnit) config.temperatureUnit = 0;
           if (!config.battery) config.battery = 0;
+          if (!config.bluetooth) config.bluetooth = 0;
+          if (!config.disconnect) config.disconnect = 0;
           $('#temperatureUnit').val(config.temperatureUnit);
           $('#battery').val(config.battery);
+          $('#bluetooth').val(config.bluetooth);
+          $('#disconnect').val(config.disconnect);
         }
       }
     });
@@ -101,6 +125,8 @@
       var config = {};
       config.temperatureUnit = $('#temperatureUnit').val() - 0;
       config.battery = $('#battery').val() - 0;
+      config.bluetooth = $('#bluetooth').val() - 0;
+      config.disconnect = $('#disconnect').val() - 0;
       var store = JSON.stringify(config);
       var options = encodeURIComponent(store);
       if (typeof window.localStorage !== "undefined") {
