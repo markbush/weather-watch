@@ -17,6 +17,12 @@
   "resources": {
     "media": [
       {
+        "file": "images/menu.png",
+        "menuIcon": true,
+        "name": "IMAGE_MENU",
+        "type": "png"
+      },
+      {
         "file": "images/weather-wind.png",
         "name": "IMAGE_WIND",
         "type": "png"
