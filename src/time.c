@@ -1,6 +1,6 @@
 #include <pebble.h>
 
-extern void update_date_display(struct tm *pebble_time);
+extern void update_date_display();
 extern Layer *s_hands_layer;
 extern TextLayer *s_date_layer;
 
@@ -28,5 +28,5 @@ void update_time(struct tm *tick_time) {
   pebble_time = tick_time;
 
   layer_mark_dirty(s_hands_layer);
-  update_date_display(pebble_time);
+  update_date_display();
 }

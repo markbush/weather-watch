@@ -35,6 +35,7 @@ void setup_bluetooth(Layer *root) {
   s_bluetooth_path = gpath_create(&BLUETOOTH_ICON);
   layer_set_update_proc(s_bluetooth_layer, bluetooth_update_proc);
   layer_add_child(root, s_bluetooth_layer);
+  bluetooth_changed_callback(bluetooth_connection_service_peek() == BLUETOOTH_CONNECTED);
   bluetooth_connection_service_subscribe(&bluetooth_changed_callback);
 }
 
@@ -63,6 +64,7 @@ static void bluetooth_changed_callback(bool connected) {
   uint8_t new_bluetooth_state = connected ? BLUETOOTH_CONNECTED : BLUETOOTH_DISCONNECTED;
   if (new_bluetooth_state != s_bluetooth_state) {
     s_bluetooth_state = new_bluetooth_state;
+    update_bluetooth();
     layer_mark_dirty(s_bluetooth_layer);
     if (s_bluetooth_state == BLUETOOTH_DISCONNECTED && s_bluetooth_disconnect != DISCONNECT_NO_ACTION) {
       switch (s_bluetooth_disconnect) {

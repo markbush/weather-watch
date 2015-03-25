@@ -6,32 +6,64 @@
 #define KEY_BATTERY 3
 #define KEY_BLUETOOTH 4
 #define KEY_DISCONNECT 5
+#define KEY_LANGUAGE 6
 
 extern void update_weather_conditions_display(uint32_t weather_state);
 extern void update_weather_temperature_display();
-extern void use_temperature_unit(uint32_t temperature_unit);
 extern void update_battery();
 extern void update_bluetooth();
+extern void update_date_display();
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void inbox_dropped_callback(AppMessageResult reason, void *context);
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context);
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context);
 static uint32_t weather_state_for_conditions(uint32_t conditions);
+void setup_remote_services();
+void load_config();
+void save_config();
 
+extern uint32_t s_temperature_unit;
 extern int s_temperature;
 extern int s_battery_showing;
 extern int s_bluetooth_showing;
 extern int s_bluetooth_disconnect;
+extern int s_locale;
 
-void setup_weather_service() {
+void setup_remote_services() {
   app_message_register_inbox_received(inbox_received_callback);
   app_message_register_inbox_dropped(inbox_dropped_callback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_outbox_sent(outbox_sent_callback);
 
   // Initialise the service and retrieve initial conditions
-  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());  
+  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+}
+
+void load_config() {
+  if (persist_exists(KEY_TEMP_UNIT)) {
+    s_temperature_unit = persist_read_int(KEY_TEMP_UNIT);
+  }
+  if (persist_exists(KEY_BATTERY)) {
+    s_battery_showing = persist_read_int(KEY_BATTERY);
+  }
+  if (persist_exists(KEY_BLUETOOTH)) {
+    s_bluetooth_showing = persist_read_int(KEY_BLUETOOTH);
+  }
+  if (persist_exists(KEY_DISCONNECT)) {
+    s_bluetooth_disconnect = persist_read_int(KEY_DISCONNECT);
+  }
+  if (persist_exists(KEY_LANGUAGE)) {
+    s_locale = persist_read_int(KEY_LANGUAGE);
+  }
+}
+
+void save_config() {
+  persist_write_int(KEY_TEMP_UNIT, s_temperature_unit);
+  persist_write_int(KEY_BATTERY, s_battery_showing);
+  persist_write_int(KEY_BLUETOOTH, s_bluetooth_showing);
+  persist_write_int(KEY_DISCONNECT, s_bluetooth_disconnect);
+  persist_write_int(KEY_LANGUAGE, s_locale);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -53,7 +85,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       update_weather_conditions_display(weather_state);
       break;
     case KEY_TEMP_UNIT:
-      use_temperature_unit((uint32_t)t->value->int32);
+      s_temperature_unit = (uint32_t)t->value->int32;
       update_weather_temperature_display();
       break;
     case KEY_BATTERY:
@@ -69,6 +101,11 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     case KEY_DISCONNECT:
       ;
       s_bluetooth_disconnect = (int)t->value->int32;
+      break;
+    case KEY_LANGUAGE:
+      ;
+      s_locale = (int)t->value->int32;
+      update_date_display();
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
