@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <title>Configuration</title>
+  <style>
+    body {
+      background: #cccccc;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    .card {
+      background: #ffffff;
+      font-size: 18px;
+      margin: 10px 5px 5px 5px;
+      border-radius: 2px;
+      min-height: 40px;
+      -webkit-box-shadow: 0 10px 6px -6px #777;
+         -moz-box-shadow: 0 10px 6px -6px #777;
+              box-shadow: 0 10px 6px -6px #777;
+    }
+    .submit {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-size: 24px;
+      background: #dddddd;
+      border: none;
+      border-radius: 3px;
+    }
+    .label {
+      width: 50%;
+      float: left;
+      text-align: right;
+      padding-top: 10px;
+      padding-right: 10px;
+    }
+    .input {
+      float: left;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weather Watch</h1>
+    <div class="card">
+      <div class="label">
+        Temp Unit:
+      </div>
+      <div class="input">
+        <select id="temperatureUnit">
+          <option value="0">&deg;C</option>
+          <option value="1">&deg;F</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        Show Battery:
+      </div>
+      <div class="input">
+        <select id="battery">
+          <option value="0">Always</option>
+          <option value="1">When &lt;=90%</option>
+          <option value="2">When &lt;=80%</option>
+          <option value="3">When &lt;=70%</option>
+          <option value="4">When &lt;=60%</option>
+          <option value="5">When &lt;=50%</option>
+          <option value="6">When &lt;=40%</option>
+          <option value="7">When &lt;=30%</option>
+          <option value="8">When &lt;=20%</option>
+          <option value="9">When &lt;=10%</option>
+          <option value="10">When Charging</option>
+          <option value="11">Never</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        BT Indicator:
+      </div>
+      <div class="input">
+        <select id="bluetooth">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        BT Disconnect:
+      </div>
+      <div class="input">
+        <select id="disconnect">
+          <option value="0">No Action</option>
+          <option value="1">Short Pulse</option>
+          <option value="2">Long Pulse</option>
+          <option value="3">Double Pulse</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        Language:
+      </div>
+      <div class="input">
+        <select id="language">
+          <!--<option value="0">Bulgarian</option>-->
+          <!--<option value="1">Byelorussian</option>-->
+          <!--<option value="2">Chinese</option>-->
+          <option value="3">Croatian</option>
+          <option value="4">Czech</option>
+          <option value="5">Danish</option>
+          <option value="6">Dutch</option>
+          <option value="7">English</option>
+          <option value="8">Estonian</option>
+          <option value="9">Finnish</option>
+          <option value="10">French</option>
+          <option value="11">German</option>
+          <!--<option value="12">Greek</option>-->
+          <option value="13">Hungarian</option>
+          <option value="14">Icelandic</option>
+          <option value="15">Italian</option>
+          <!--<option value="16">Japanese</option>-->
+          <option value="17">Lithuanian</option>
+          <option value="18">Norwegian</option>
+          <option value="19">Polish</option>
+          <option value="20">Portuguese</option>
+          <option value="21">Romanian</option>
+          <!--<option value="22">Russian</option>-->
+          <!--<option value="23">Serbian</option>-->
+          <option value="24">Slovak</option>
+          <option value="25">Slovenian</option>
+          <option value="26">Spanish</option>
+          <option value="27">Swedish</option>
+          <option value="28">Turkish</option>
+          <!--<option value="29">Ukranian</option>-->
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <button type="submit" id="submit" class="submit card">Save Settings</button>
+    </div>
+  <script>
+    $().ready(function() {
+      if (typeof window.localStorage !== "undefined") {
+        if (window.localStorage.weatherWatch) {
+          var config = JSON.parse(window.localStorage.weatherWatch);
+          if (!config.temperatureUnit) config.temperatureUnit = 0;
+          if (!config.battery) config.battery = 0;
+          if (!config.bluetooth) config.bluetooth = 0;
+          if (!config.disconnect) config.disconnect = 0;
+          if (!config.language) config.language = 7;
+          $('#temperatureUnit').val(config.temperatureUnit);
+          $('#battery').val(config.battery);
+          $('#bluetooth').val(config.bluetooth);
+          $('#disconnect').val(config.disconnect);
+          $('#language').val(config.language);
+        }
+      }
+    });
+    $('#submit').click(function() {
+      var config = {};
+      config.temperatureUnit = $('#temperatureUnit').val() - 0;
+      config.battery = $('#battery').val() - 0;
+      config.bluetooth = $('#bluetooth').val() - 0;
+      config.disconnect = $('#disconnect').val() - 0;
+      config.language = $('#language').val() - 0;
+      var store = JSON.stringify(config);
+      var options = encodeURIComponent(store);
+      if (typeof window.localStorage !== "undefined") {
+        window.localStorage.weatherWatch = store;
+      }
+      window.location.href = "pebblejs://close#" + options;
+    });
+  </script>
+</body>
+</html>
