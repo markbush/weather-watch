@@ -5,6 +5,7 @@
 
 void update_weather_conditions_display(uint32_t weather_state);
 void update_weather_temperature_display();
+void update_weather();
 
 uint32_t s_weather_state = RESOURCE_ID_IMAGE_ALERT;
 static BitmapLayer *s_conditions_layer;
@@ -12,6 +13,8 @@ static TextLayer *s_temperature_layer;
 static GBitmap *s_conditions_bitmap;
 int s_temperature = 0;
 uint32_t s_temperature_unit = CELSIUS;
+int s_temperature_showing = 0;
+int s_weather_showing = 0;
 
 void setup_weather(Layer *root) {
   // Create temperature Layer
@@ -27,6 +30,8 @@ void setup_weather(Layer *root) {
   s_conditions_bitmap = gbitmap_create_with_resource(s_weather_state);
   bitmap_layer_set_bitmap(s_conditions_layer, s_conditions_bitmap);
   layer_add_child(root, bitmap_layer_get_layer(s_conditions_layer));
+
+  update_weather();
 }
 
 void teardown_weather() {
@@ -56,4 +61,17 @@ void update_weather_temperature_display() {
     snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
   }
   text_layer_set_text(s_temperature_layer, temperature_buffer);
+}
+
+void update_weather() {
+  if (s_temperature_showing == 0) {
+    layer_set_hidden(text_layer_get_layer(s_temperature_layer), false);
+  } else {
+    layer_set_hidden(text_layer_get_layer(s_temperature_layer), true);
+  }
+  if (s_weather_showing == 0) {
+    layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), false);
+  } else {
+    layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), true);
+  }
 }

@@ -6,7 +6,9 @@
     "battery": 3,
     "bluetooth": 4,
     "disconnect": 5,
-    "language": 6
+    "language": 6,
+    "showTemperature": 7,
+    "showWeather": 8
   },
   "capabilities": [
     "location",

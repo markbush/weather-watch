@@ -14,7 +14,12 @@ There are a number of configuration items available:
 
 * Temperature unit (&deg;C or &deg;F)
 * Battery status (you can choose to show the battery status always, never, only when charging or while it is less than a specified threshold)
+* Hide/show temperature
+* Hide/show weather conditions
 * Bluetooth indicator (showing while connected or never showing)
 * Bluetooth disconnect alert (choose a type of vibration alert when the watch loses bluetooth connectivity with your phone)
+* Language
 
-I am going to be adding configuration for whether the temperature and weather conditions are shown and aim to provide support for displaying the date in non-English locales.
+You can select to view the date in one of the following languages: Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Hungarian, Icelandic, Italian, Lithuanian, Norwegian, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish, Turkish
+
+It is intended for a future release to support Chinese, Japanese, Greek and Cyrillic based languages.

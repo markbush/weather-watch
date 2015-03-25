@@ -7,12 +7,15 @@
 #define KEY_BLUETOOTH 4
 #define KEY_DISCONNECT 5
 #define KEY_LANGUAGE 6
+#define KEY_SHOW_TEMP 7
+#define KEY_SHOW_WEATHER 8
 
 extern void update_weather_conditions_display(uint32_t weather_state);
 extern void update_weather_temperature_display();
 extern void update_battery();
 extern void update_bluetooth();
 extern void update_date_display();
+extern void update_weather();
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void inbox_dropped_callback(AppMessageResult reason, void *context);
@@ -29,6 +32,8 @@ extern int s_battery_showing;
 extern int s_bluetooth_showing;
 extern int s_bluetooth_disconnect;
 extern int s_locale;
+extern int s_temperature_showing;
+extern int s_weather_showing;
 
 void setup_remote_services() {
   app_message_register_inbox_received(inbox_received_callback);
@@ -56,6 +61,12 @@ void load_config() {
   if (persist_exists(KEY_LANGUAGE)) {
     s_locale = persist_read_int(KEY_LANGUAGE);
   }
+  if (persist_exists(KEY_SHOW_TEMP)) {
+    s_temperature_showing = persist_read_int(KEY_SHOW_TEMP);
+  }
+  if (persist_exists(KEY_SHOW_WEATHER)) {
+    s_weather_showing = persist_read_int(KEY_SHOW_WEATHER);
+  }
 }
 
 void save_config() {
@@ -64,6 +75,8 @@ void save_config() {
   persist_write_int(KEY_BLUETOOTH, s_bluetooth_showing);
   persist_write_int(KEY_DISCONNECT, s_bluetooth_disconnect);
   persist_write_int(KEY_LANGUAGE, s_locale);
+  persist_write_int(KEY_SHOW_TEMP, s_temperature_showing);
+  persist_write_int(KEY_SHOW_WEATHER, s_weather_showing);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -106,6 +119,16 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       ;
       s_locale = (int)t->value->int32;
       update_date_display();
+      break;
+    case KEY_SHOW_TEMP:
+      ;
+      s_temperature_showing = (int)t->value->int32;
+      update_weather();
+      break;
+    case KEY_SHOW_WEATHER:
+      ;
+      s_weather_showing = (int)t->value->int32;
+      update_weather();
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
