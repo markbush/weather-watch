@@ -80,6 +80,28 @@
     </div>
     <div class="card">
       <div class="label">
+        Show Temp:
+      </div>
+      <div class="input">
+        <select id="showTemperature">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        Show Weather:
+      </div>
+      <div class="input">
+        <select id="showWeather">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
         BT Indicator:
       </div>
       <div class="input">
@@ -103,6 +125,45 @@
       </div>
     </div>
     <div class="card">
+      <div class="label">
+        Language:
+      </div>
+      <div class="input">
+        <select id="language">
+          <!--<option value="0">Bulgarian</option>-->
+          <!--<option value="1">Byelorussian</option>-->
+          <!--<option value="2">Chinese</option>-->
+          <option value="3">Croatian</option>
+          <option value="4">Czech</option>
+          <option value="5">Danish</option>
+          <option value="6">Dutch</option>
+          <option value="7">English</option>
+          <option value="8">Estonian</option>
+          <option value="9">Finnish</option>
+          <option value="10">French</option>
+          <option value="11">German</option>
+          <!--<option value="12">Greek</option>-->
+          <option value="13">Hungarian</option>
+          <option value="14">Icelandic</option>
+          <option value="15">Italian</option>
+          <!--<option value="16">Japanese</option>-->
+          <option value="17">Lithuanian</option>
+          <option value="18">Norwegian</option>
+          <option value="19">Polish</option>
+          <option value="20">Portuguese</option>
+          <option value="21">Romanian</option>
+          <!--<option value="22">Russian</option>-->
+          <!--<option value="23">Serbian</option>-->
+          <option value="24">Slovak</option>
+          <option value="25">Slovenian</option>
+          <option value="26">Spanish</option>
+          <option value="27">Swedish</option>
+          <option value="28">Turkish</option>
+          <!--<option value="29">Ukranian</option>-->
+        </select>
+      </div>
+    </div>
+    <div class="card">
       <button type="submit" id="submit" class="submit card">Save Settings</button>
     </div>
   <script>
@@ -112,12 +173,18 @@
           var config = JSON.parse(window.localStorage.weatherWatch);
           if (!config.temperatureUnit) config.temperatureUnit = 0;
           if (!config.battery) config.battery = 0;
+          if (!config.showTemperature) config.showTemperature = 0;
+          if (!config.showWeather) config.showWeather = 0;
           if (!config.bluetooth) config.bluetooth = 0;
           if (!config.disconnect) config.disconnect = 0;
+          if (!config.language) config.language = 7;
           $('#temperatureUnit').val(config.temperatureUnit);
           $('#battery').val(config.battery);
+          $('#showTemperature').val(config.showTemperature);
+          $('#showWeather').val(config.showWeather);
           $('#bluetooth').val(config.bluetooth);
           $('#disconnect').val(config.disconnect);
+          $('#language').val(config.language);
         }
       }
     });
@@ -125,8 +192,11 @@
       var config = {};
       config.temperatureUnit = $('#temperatureUnit').val() - 0;
       config.battery = $('#battery').val() - 0;
+      config.showTemperature = $('#showTemperature').val() - 0;
+      config.showWeather = $('#showWeather').val() - 0;
       config.bluetooth = $('#bluetooth').val() - 0;
       config.disconnect = $('#disconnect').val() - 0;
+      config.language = $('#language').val() - 0;
       var store = JSON.stringify(config);
       var options = encodeURIComponent(store);
       if (typeof window.localStorage !== "undefined") {
