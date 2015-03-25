@@ -80,6 +80,28 @@
     </div>
     <div class="card">
       <div class="label">
+        Show Temp:
+      </div>
+      <div class="input">
+        <select id="showTemperature">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
+        Show Weather:
+      </div>
+      <div class="input">
+        <select id="showWeather">
+          <option value="0">Yes</option>
+          <option value="1">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">
         BT Indicator:
       </div>
       <div class="input">
@@ -151,11 +173,15 @@
           var config = JSON.parse(window.localStorage.weatherWatch);
           if (!config.temperatureUnit) config.temperatureUnit = 0;
           if (!config.battery) config.battery = 0;
+          if (!config.showTemperature) config.showTemperature = 0;
+          if (!config.showWeather) config.showWeather = 0;
           if (!config.bluetooth) config.bluetooth = 0;
           if (!config.disconnect) config.disconnect = 0;
           if (!config.language) config.language = 7;
           $('#temperatureUnit').val(config.temperatureUnit);
           $('#battery').val(config.battery);
+          $('#showTemperature').val(config.showTemperature);
+          $('#showWeather').val(config.showWeather);
           $('#bluetooth').val(config.bluetooth);
           $('#disconnect').val(config.disconnect);
           $('#language').val(config.language);
@@ -166,6 +192,8 @@
       var config = {};
       config.temperatureUnit = $('#temperatureUnit').val() - 0;
       config.battery = $('#battery').val() - 0;
+      config.showTemperature = $('#showTemperature').val() - 0;
+      config.showWeather = $('#showWeather').val() - 0;
       config.bluetooth = $('#bluetooth').val() - 0;
       config.disconnect = $('#disconnect').val() - 0;
       config.language = $('#language').val() - 0;
