@@ -171,13 +171,13 @@
       if (typeof window.localStorage !== "undefined") {
         if (window.localStorage.weatherWatch) {
           var config = JSON.parse(window.localStorage.weatherWatch);
-          if (!config.temperatureUnit) config.temperatureUnit = 0;
-          if (!config.battery) config.battery = 0;
-          if (!config.showTemperature) config.showTemperature = 0;
-          if (!config.showWeather) config.showWeather = 0;
-          if (!config.bluetooth) config.bluetooth = 0;
-          if (!config.disconnect) config.disconnect = 0;
-          if (!config.language) config.language = 7;
+          if (typeof config.temperatureUnit === "undefined") config.temperatureUnit = 0;
+          if (typeof config.battery === "undefined") config.battery = 0;
+          if (typeof config.showTemperature === "undefined") config.showTemperature = 0;
+          if (typeof config.showWeather === "undefined") config.showWeather = 0;
+          if (typeof config.bluetooth === "undefined") config.bluetooth = 0;
+          if (typeof config.disconnect === "undefined") config.disconnect = 0;
+          if (typeof config.language === "undefined") config.language = 7;
           $('#temperatureUnit').val(config.temperatureUnit);
           $('#battery').val(config.battery);
           $('#showTemperature').val(config.showTemperature);
