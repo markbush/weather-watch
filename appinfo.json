@@ -108,7 +108,7 @@
   "shortName": "Weather Watch",
   "uuid": "397989b9-79db-4083-80cc-b8eab03536e1",
   "versionCode": 1,
-  "versionLabel": "1.1",
+  "versionLabel": "1.2",
   "watchapp": {
     "watchface": true
   }
