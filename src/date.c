@@ -35,16 +35,22 @@
 #define NUM_LOCALES 30
 
 void update_date_display();
+void set_date_font();
 
 extern struct tm *pebble_time;
 
 static TextLayer *s_date_layer;
+GFont s_date_font;
+GFont s_date_font_en;
+GFont s_date_font_gr;
+GFont s_date_font_ru;
+GFont s_date_font_cn;
 int s_locale = LC_EN;
 
-static char DAY[NUM_LOCALES][7][6] = {
+static char DAY[NUM_LOCALES][7][12] = {
   {"Нд ", "Пн ", "Вт ", "Ср ", "Чт ", "Пт ", "Сб "}, // LC_BG Bulgarian
   {"нд ", "пн ", "аў ", "ср ", "чц ", "пт ", "сб "}, // LC_BY Byelorussian
-  {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}, // LC_CN Chinese
+  {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"}, // LC_CN Chinese
   {"Ne", "Po", "Ut", "Sr", "Če", "Pe", "Su"},        // LC_HR Croatian
   {"ne", "po", "út", "st", "čt", "pá", "so"},        // LC_CZ Czech
   {"Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"}, // LC_DK Danish
@@ -58,7 +64,7 @@ static char DAY[NUM_LOCALES][7][6] = {
   {"Vas", "Hét", "Ked", "Sze", "Csü", "Pén", "Szo"}, // LC_HU Hungarian
   {"sun", "mán", "þri", "mið", "fim", "fös", "lau"}, // LC_IS Icelandic
   {"Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"}, // LC_IT Italian
-  {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}, // LC_JP Japanese
+  {"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"}, // LC_JP Japanese
   {"Sk", "Pr", "An", "Tr", "Kt", "Pn", "Št"},        // LC_LT Lithuanian
   {"søn", "man", "tir", "ons", "tor", "fre", "lør"}, // LC_NO Norwegian
   {"ndz", "pon", "wto", "śro", "czw", "ptk", "sob"}, // LC_PL Polish
@@ -73,10 +79,10 @@ static char DAY[NUM_LOCALES][7][6] = {
   {"Paz", "Pts", "Sal", "Çar", "Per", "Cum", "Cts"}, // LC_TR Turkish
   {"нд", "пн", "вт", "ср", "чт", "пт", "сб"}         // LC_UA Ukranian
 };
-static char MONTH[NUM_LOCALES][12][8] = {
+static char MONTH[NUM_LOCALES][12][12] = {
   {"Яну", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Нов", "Дек"},
   {"сту", "лют", "сак", "кра", "тра", "чэр", "ліп", "жні", "вер", "кас", "ліс", "сне"},
-  {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+  {"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
   {"Sij", "Vel", "Ožu", "Tra", "Svi", "Lip", "Srp", "Kol", "Ruj", "Lis", "Stu", "Pro"},
   {"led", "úno", "bře", "dub", "kvě", "črv", "čvc", "srp", "zář", "říj", "lis", "pro"},
   {"Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"},
@@ -90,7 +96,7 @@ static char MONTH[NUM_LOCALES][12][8] = {
   {"Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Sze", "Okt", "Nov", "Dec"},
   {"jan", "feb", "mar", "apr", "maí", "jún", "júl", "ágú", "sep", "okt", "nóv", "des"},
   {"Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"},
-  {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+  {"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
   {"Sau", "Vas", "Kov", "Bal", "Geg", "Bir", "Lie", "Rgp", "Rgs", "Spa", "Lap", "Grd"},
   {"jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "des"},
   {"sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"},
@@ -110,12 +116,25 @@ void setup_date(Layer *root) {
   s_date_layer = text_layer_create(GRect(0, 58, 144, 28));
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorWhite);
-  text_layer_set_font(s_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  s_date_font_en = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
+  s_date_font_gr = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_GR_20));
+  s_date_font_ru = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_RU_20));
+  //s_date_font_cn = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CN_20));
+  set_date_font();
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   layer_add_child(root, text_layer_get_layer(s_date_layer));
 }
 
 void teardown_date() {
+  if (s_date_font_gr) {
+    fonts_unload_custom_font(s_date_font_gr);
+  }
+  if (s_date_font_ru) {
+    fonts_unload_custom_font(s_date_font_ru);
+  }
+  if (s_date_font_cn) {
+    fonts_unload_custom_font(s_date_font_cn);
+  }
   text_layer_destroy(s_date_layer);
 }
 
@@ -127,5 +146,37 @@ void update_date_display() {
   int mday = pebble_time->tm_mday;
   char *mon = MONTH[s_locale][pebble_time->tm_mon];
   snprintf(day_date_buffer, sizeof(day_date_buffer), "%s %d %s", wday, mday, mon);
+  set_date_font();
   text_layer_set_text(s_date_layer, day_date_buffer);
+}
+
+void set_date_font() {
+  GFont new_font = s_date_font_en;
+  GRect frame = GRect(0, 58, 144, 28);
+  switch (s_locale) {
+  case LC_GR:
+    ;
+    new_font = s_date_font_gr;
+    frame = GRect(0, 65, 144, 28);
+    break;
+  case LC_BG:
+  case LC_BY:
+  case LC_RU:
+  case LC_YU:
+  case LC_UA:
+    ;
+    new_font = s_date_font_ru;
+    frame = GRect(0, 65, 144, 28);
+    break;
+  case LC_CN:
+  case LC_JP:
+    ;
+    //new_font = s_date_font_cn;
+    break;
+  }
+  if (s_date_font != new_font) {
+    s_date_font = new_font;
+    text_layer_set_font(s_date_layer, s_date_font);
+    layer_set_frame(text_layer_get_layer(s_date_layer), frame);
+  }
 }

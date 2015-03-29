@@ -20,6 +20,18 @@
   "resources": {
     "media": [
       {
+        "characterRegex": "[ 0-9\u0410\u0412\u0414\u041c\u041d\u041e\u041f\u0421\u0424\u0427\u042e\u042f\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0446\u0447\u044d\u044e\u044f\u0456\u0458\u045e]",
+        "file": "fonts/Arimo-Bold.ttf",
+        "name": "FONT_B_RU_20",
+        "type": "font"
+      },
+      {
+        "characterRegex": "[ 0-9\u0391\u0394\u0399\u039a\u039c\u039d\u039f\u03a0\u03a3\u03a4\u03a6\u03b1\u03b2\u03b3\u03b5\u03b9\u03ba\u03bb\u03bc\u03bd\u03bf\u03c0\u03c1\u03c4\u03c5\u03ca]",
+        "file": "fonts/Arimo-Bold.ttf",
+        "name": "FONT_B_GR_20",
+        "type": "font"
+      },
+      {
         "file": "images/menu.png",
         "menuIcon": true,
         "name": "IMAGE_MENU",
