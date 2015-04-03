@@ -20,6 +20,4 @@ There are a number of configuration items available:
 * Bluetooth disconnect alert (choose a type of vibration alert when the watch loses bluetooth connectivity with your phone)
 * Language
 
-You can select to view the date in one of the following languages: Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Hungarian, Icelandic, Italian, Lithuanian, Norwegian, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish, Turkish
-
-It is intended for a future release to support Chinese, Japanese, Greek and Cyrillic based languages.
+You can select to view the date in one of the following languages: Bulgarian, Byelorussian, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Icelandic, Italian, Japanese, Lithuanian, Norwegian, Polish, Portuguese, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Turkish, Ukranian
