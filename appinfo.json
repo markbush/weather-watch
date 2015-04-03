@@ -21,7 +21,7 @@
     "media": [
       {
         "file": "fonts/pebble-cn.ttf",
-        "name": "FONT_CN_18",
+        "name": "FONT_CN_16",
         "type": "font"
       },
       {
@@ -33,8 +33,18 @@
       {
         "characterRegex": "[ 0-9\u0391\u0394\u0399\u039a\u039c\u039d\u039f\u03a0\u03a3\u03a4\u03a6\u03b1\u03b2\u03b3\u03b5\u03b9\u03ba\u03bb\u03bc\u03bd\u03bf\u03c0\u03c1\u03c4\u03c5\u03ca]",
         "file": "fonts/Arimo-Bold.ttf",
-        "name": "FONT_B_GR_20",
+        "name": "FONT_B_GR_18",
         "type": "font"
+      },
+      {
+        "file": "images/background.png",
+        "name": "IMAGE_BACKGROUND",
+        "type": "png"
+      },
+      {
+        "file": "images/alert.png",
+        "name": "IMAGE_ALERT",
+        "type": "png"
       },
       {
         "file": "images/menu.png",
@@ -43,22 +53,22 @@
         "type": "png"
       },
       {
-        "file": "images/weather-wind.png",
-        "name": "IMAGE_WIND",
+        "file": "images/weather-clear.png",
+        "name": "IMAGE_CLEAR",
         "type": "png"
       },
       {
-        "file": "images/weather-thunder.png",
-        "name": "IMAGE_THUNDERSTORM",
+        "file": "images/weather-cloud-broken.png",
+        "name": "IMAGE_CLOUDS_BROKEN",
         "type": "png"
       },
       {
-        "file": "images/weather-snow.png",
-        "name": "IMAGE_SNOW",
+        "file": "images/weather-cloud-few.png",
+        "name": "IMAGE_CLOUDS_FEW",
         "type": "png"
       },
       {
-        "file": "images/weather-scattered.png",
+        "file": "images/weather-cloud-scattered.png",
         "name": "IMAGE_CLOUDS_SCATTERED",
         "type": "png"
       },
@@ -68,38 +78,28 @@
         "type": "png"
       },
       {
-        "file": "images/weather-light.png",
-        "name": "IMAGE_RAIN_LIGHT",
-        "type": "png"
-      },
-      {
-        "file": "images/weather-heavy.png",
+        "file": "images/weather-rain-heavy.png",
         "name": "IMAGE_RAIN_HEAVY",
         "type": "png"
       },
       {
-        "file": "images/weather-few.png",
-        "name": "IMAGE_CLOUDS_FEW",
+        "file": "images/weather-rain-light.png",
+        "name": "IMAGE_RAIN_LIGHT",
         "type": "png"
       },
       {
-        "file": "images/weather-clear.png",
-        "name": "IMAGE_CLEAR",
+        "file": "images/weather-snow.png",
+        "name": "IMAGE_SNOW",
         "type": "png"
       },
       {
-        "file": "images/weather-broken.png",
-        "name": "IMAGE_CLOUDS_BROKEN",
+        "file": "images/weather-thunderstorm.png",
+        "name": "IMAGE_THUNDERSTORM",
         "type": "png"
       },
       {
-        "file": "images/background.png",
-        "name": "IMAGE_BACKGROUND",
-        "type": "png"
-      },
-      {
-        "file": "images/alert-triangle-48.png",
-        "name": "IMAGE_ALERT",
+        "file": "images/weather-wind.png",
+        "name": "IMAGE_WIND",
         "type": "png"
       }
     ]
@@ -108,7 +108,7 @@
   "shortName": "Weather Watch",
   "uuid": "397989b9-79db-4083-80cc-b8eab03536e1",
   "versionCode": 1,
-  "versionLabel": "1.1",
+  "versionLabel": "2.0",
   "watchapp": {
     "watchface": true
   }

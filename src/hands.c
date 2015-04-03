@@ -10,17 +10,17 @@ Layer *s_hands_layer;
 static GPath *s_minute_hand_path;
 static const GPathInfo MINUTE_HAND = {
     3, (GPoint []){
-        {-2, -55},
+        {-2, -52},
         {0, -64},
-        {2, -55}
+        {2, -52}
     }
 };
 static GPath *s_hour_hand_path;
 static const GPathInfo HOUR_HAND = {
     3, (GPoint []){
-        {-6, -55},
+        {-6, -52},
         {0, -62},
-        {6, -55}
+        {6, -52}
     }
 };
 
@@ -36,7 +36,7 @@ void setup_hands(Layer *root) {
   layer_set_update_proc(s_hands_layer, hands_update_proc);
 
   // Initialise clock
-  time_t temp = time(NULL); 
+  time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   update_time(tick_time);
 }
@@ -70,4 +70,3 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   gpath_draw_outline(ctx, s_hour_hand_path);
   gpath_draw_filled(ctx, s_hour_hand_path);
 }
-

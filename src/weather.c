@@ -26,7 +26,7 @@ void setup_weather(Layer *root) {
   layer_add_child(root, text_layer_get_layer(s_temperature_layer));
 
   // Create conditions Layer
-  s_conditions_layer = bitmap_layer_create(GRect(48, 92, 48, 48));
+  s_conditions_layer = bitmap_layer_create(GRect(56, 100, 32, 32));
   s_conditions_bitmap = gbitmap_create_with_resource(s_weather_state);
   bitmap_layer_set_bitmap(s_conditions_layer, s_conditions_bitmap);
   layer_add_child(root, bitmap_layer_get_layer(s_conditions_layer));

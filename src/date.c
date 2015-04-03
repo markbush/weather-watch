@@ -117,13 +117,13 @@ static char MONTH[NUM_LOCALES][12][12] = {
 };
 
 void setup_date(Layer *root) {
-  s_date_layer = text_layer_create(GRect(0, 58, 144, 28));
+  s_date_layer = text_layer_create(GRect(0, 62, 144, 32));
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorWhite);
   s_date_font_en = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
-  s_date_font_gr = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_GR_20));
+  s_date_font_gr = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_GR_18));
   s_date_font_ru = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_RU_20));
-  s_date_font_cn = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CN_18));
+  s_date_font_cn = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CN_16));
   set_date_font();
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   layer_add_child(root, text_layer_get_layer(s_date_layer));
@@ -156,12 +156,12 @@ void update_date_display() {
 
 void set_date_font() {
   GFont new_font = s_date_font_en;
-  GRect frame = GRect(0, 58, 144, 28);
+  GRect frame = GRect(0, 62, 144, 32);
   switch (s_locale) {
   case LC_GR:
     ;
     new_font = s_date_font_gr;
-    frame = GRect(0, 65, 144, 28);
+    frame = GRect(0, 67, 144, 32);
     break;
   case LC_BG:
   case LC_BY:
@@ -170,13 +170,13 @@ void set_date_font() {
   case LC_UA:
     ;
     new_font = s_date_font_ru;
-    frame = GRect(0, 65, 144, 28);
+    frame = GRect(0, 67, 144, 32);
     break;
   case LC_CN:
   case LC_JP:
     ;
     new_font = s_date_font_cn;
-    frame = GRect(0, 65, 144, 35);
+    frame = GRect(0, 71, 144, 32);
     break;
   }
   if (s_date_font != new_font) {
