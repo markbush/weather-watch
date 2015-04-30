@@ -96,6 +96,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       ;
       uint32_t weather_state = weather_state_for_conditions((uint32_t)t->value->int32);
       update_weather_conditions_display(weather_state);
+      update_weather_temperature_display();
       break;
     case KEY_TEMP_UNIT:
       s_temperature_unit = (uint32_t)t->value->int32;
@@ -145,7 +146,9 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 }
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed: %d", reason);
+  update_weather_conditions_display(RESOURCE_ID_IMAGE_QUERY);
+  update_weather_temperature_display();
 }
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
@@ -154,7 +157,11 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 
 static uint32_t weather_state_for_conditions(uint32_t conditions) {
   uint32_t weather_state = RESOURCE_ID_IMAGE_ALERT;
-  if (conditions == 800) {
+  if (conditions == 0) {
+    weather_state = RESOURCE_ID_IMAGE_ALERT;
+  } else if (conditions == 1) {
+    weather_state = RESOURCE_ID_IMAGE_LOCATION;
+  } else if (conditions == 800) {
     weather_state = RESOURCE_ID_IMAGE_CLEAR;
   } else if (conditions == 801) {
     weather_state = RESOURCE_ID_IMAGE_CLOUDS_FEW;

@@ -7,7 +7,7 @@ void update_weather_conditions_display(uint32_t weather_state);
 void update_weather_temperature_display();
 void update_weather();
 
-uint32_t s_weather_state = RESOURCE_ID_IMAGE_ALERT;
+uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
 static BitmapLayer *s_conditions_layer;
 static TextLayer *s_temperature_layer;
 static GBitmap *s_conditions_bitmap;
@@ -54,11 +54,17 @@ void update_weather_conditions_display(uint32_t weather_state) {
 void update_weather_temperature_display() {
   static char temperature_buffer[8];
 
-  if (s_temperature_unit == CELSIUS) {
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", s_temperature);
+  if (s_weather_state == RESOURCE_ID_IMAGE_ALERT
+      || s_weather_state == RESOURCE_ID_IMAGE_LOCATION
+      || s_weather_state == RESOURCE_ID_IMAGE_QUERY) {
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "?");
   } else {
-    int temperature = (s_temperature * 9 / 5) + 32;
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
+    if (s_temperature_unit == CELSIUS) {
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", s_temperature);
+    } else {
+      int temperature = (s_temperature * 9 / 5) + 32;
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
+    }
   }
   text_layer_set_text(s_temperature_layer, temperature_buffer);
 }

@@ -1,14 +1,41 @@
-var xhrRequest = function (url, type, callback) {
+function xhrRequest(url, type, callback) {
   var xhr = new XMLHttpRequest();
   xhr.onload = function () {
     callback(this.responseText);
   };
   xhr.open(type, url);
   xhr.send();
-};
+}
 
 var config_url = 'http://markbush.github.io/weather-watch/';
 var config = {};
+
+function weatherCallback(responseText) {
+  var json = '';
+  try {
+    json = JSON.parse(responseText);
+  } catch (e) {
+    json = '';
+  }
+  var dictionary = {
+    "conditions": 0
+  };
+  if (json !== null && json !== '' && typeof json.main !== 'undefined') {
+    dictionary.temperature = Math.round(json.main.temp - 273.15);
+    dictionary.conditions = json.weather[0].id;
+  } else if (json.message) {
+    console.log("No weather available: " + json.message);
+  } else {
+    console.log("Weather not available: " + responseText);
+  }
+  Pebble.sendAppMessage(dictionary,
+    function(e) {
+    },
+    function(e) {
+      console.log("Error sending weather info to Pebble!");
+    }
+  );
+}
 
 function locationSuccess(pos) {
   // Construct URL
@@ -17,41 +44,27 @@ function locationSuccess(pos) {
 
   // Send request to OpenWeatherMap
   //console.log("URL: " + url);
-  xhrRequest(url, 'GET', 
-    function(responseText) {
-      // responseText contains a JSON object with weather info
-      //console.log("Weather: " + responseText);
-      var json = JSON.parse(responseText);
-
-      // Temperature in Kelvin requires adjustment
-      var temperature = Math.round(json.main.temp - 273.15);
-      //console.log("Temperature is " + temperature);
-
-      // Conditions
-      var conditions = json.weather[0].id;      
-      //console.log("Conditions are " + conditions);
-
-      // Assemble dictionary using our keys
-      var dictionary = {
-        "temperature": temperature,
-        "conditions": conditions
-      };
-
-      // Send to Pebble
-      Pebble.sendAppMessage(dictionary,
-        function(e) {
-          //console.log("Weather info: " + json.main.temp + "(" + temperature + ")" + " " + conditions);
-        },
-        function(e) {
-          console.log("Error sending weather info to Pebble!");
-        }
-      );
-    }      
-  );
+  xhrRequest(url, 'GET', weatherCallback);
 }
 
 function locationError(err) {
-  console.log("Error requesting location!");
+  var errMsg = err.message;
+  if (err.code == err.PERMISSION_DENIED) {
+    errMsg = 'Location services denied';
+  } else if (err.code == err.POSITION_UNAVAILABLE) {
+    errMsg = 'Location not available';
+  }
+  console.log("Error requesting location: " + errMsg);
+  var dictionary = {
+    "conditions": 1
+  };
+  Pebble.sendAppMessage(dictionary,
+    function(e) {
+    },
+    function(e) {
+      console.log("Error sending location error to Pebble!");
+    }
+  );
 }
 
 function getWeather() {
@@ -63,7 +76,7 @@ function getWeather() {
 }
 
 // Listen for when the watchface is opened
-Pebble.addEventListener('ready', 
+Pebble.addEventListener('ready',
   function(e) {
     console.log("PebbleKit JS ready!");
 
@@ -77,7 +90,7 @@ Pebble.addEventListener('appmessage',
   function(e) {
     //console.log("AppMessage received!");
     getWeather();
-  }                     
+  }
 );
 
 Pebble.addEventListener("showConfiguration", function(e) {
