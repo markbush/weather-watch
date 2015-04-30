@@ -8,6 +8,14 @@ A typical view of the watch is as follows:
 
 ![Weather Watch](https://raw.githubusercontent.com/markbush/weather-watch/master/resources/images/watch-1.png "Weather Watch")
 
+### Communication Errors
+
+![Phone Error](https://raw.githubusercontent.com/markbush/weather-watch/master/resources/images/query.png "Phone Error") Waiting for connection to the phone to obtain weather info.
+![Location Error](https://raw.githubusercontent.com/markbush/weather-watch/master/resources/images/location.png "Location Error") Cannot obtain location.  Check phone's location services are turned on.  If they are, then the phone is currently unable to determine its location.
+![Weather Error](https://raw.githubusercontent.com/markbush/weather-watch/master/resources/images/alert.png "Weather Error") The weather service is unavailable.  This either means the service is temporarily down or your phone has no network coverage.
+
+If a communication error occurs, you can force the watchface to try again by switching to another app and back on the Pebble.  If the error persists, then either Pebble cannot connect to your phone (check your bluetooth settings) or your phone is not connecting to the internet (try again when you have better network coverage).
+
 ## Configuration
 
 There are a number of configuration items available:
