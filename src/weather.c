@@ -41,6 +41,20 @@ void teardown_weather() {
 }
 
 void update_weather_conditions_display(uint32_t weather_state) {
+  static int failures = 0;
+
+  if (weather_state == RESOURCE_ID_IMAGE_ALERT
+      || weather_state == RESOURCE_ID_IMAGE_LOCATION
+      || weather_state == RESOURCE_ID_IMAGE_QUERY) {
+    if (failures < 3) {
+      failures += 1;
+      // Ignore up to 3 failures
+      weather_state = s_weather_state;
+    }
+  } else {
+    failures = 0;
+  }
+
   if (weather_state != s_weather_state) {
     if (s_conditions_bitmap) {
       gbitmap_destroy(s_conditions_bitmap);
