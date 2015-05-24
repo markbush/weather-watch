@@ -32,7 +32,7 @@ void setup_main_window() {
     .unload = main_window_unload
   });
 
-  window_stack_push(s_main_window, true);  
+  window_stack_push(s_main_window, true);
 }
 
 void teardown_main_window() {
@@ -59,7 +59,11 @@ static void main_window_unload(Window *window) {
 }
 
 static void setup_background(Layer *root) {
+#ifdef PBL_COLOR
+  s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR);
+#else
   s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND);
+#endif
   s_background_layer = bitmap_layer_create(GRect(0, 0, 144, 168));
   bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
   layer_add_child(root, bitmap_layer_get_layer(s_background_layer));

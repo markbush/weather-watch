@@ -39,7 +39,14 @@
       {
         "file": "images/background.png",
         "name": "IMAGE_BACKGROUND",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
+      },
+      {
+        "file": "images/background-day-clear.png",
+        "name": "IMAGE_BACKGROUND_DAY_CLEAR",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
       },
       {
         "file": "images/alert.png",
@@ -114,12 +121,16 @@
       }
     ]
   },
-  "sdkVersion": "2",
+  "sdkVersion": "3",
   "shortName": "Weather Watch",
   "uuid": "397989b9-79db-4083-80cc-b8eab03536e1",
   "versionCode": 1,
   "versionLabel": "2.0",
   "watchapp": {
     "watchface": true
-  }
+  },
+  "targetPlatforms": [
+    "aplite",
+    "basalt"
+  ]
 }

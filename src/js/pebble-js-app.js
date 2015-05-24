@@ -11,16 +11,14 @@ var config_url = 'http://markbush.github.io/weather-watch/';
 var config = {};
 
 function weatherCallback(responseText) {
-  var json = '';
+  var json = {};
   try {
     json = JSON.parse(responseText);
-  } catch (e) {
-    json = '';
-  }
+  } catch (e) { }
   var dictionary = {
     "conditions": 0
   };
-  if (json !== null && json !== '' && typeof json.main !== 'undefined') {
+  if (typeof json.main !== 'undefined') {
     dictionary.temperature = Math.round(json.main.temp - 273.15);
     dictionary.conditions = json.weather[0].id;
   } else if (json.message) {
