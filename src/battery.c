@@ -27,17 +27,15 @@ int s_battery_showing = SHOW_ALWAYS;
 
 static GPath *s_battery_path;
 static const GPathInfo BATTERY_ICON = {
-    10, (GPoint []){
+    8, (GPoint []){
         {0, 2},
-        {15, 2},
-        {15, 7},
-        {16, 7},
-        {16, 4},
-        {17, 4},
-        {17, 8},
-        {15, 8},
-        {15, 10},
-        {0, 10}
+        {13, 2},
+        {13, 6},
+        {14, 6},
+        {14, 5},
+        {13, 5},
+        {13, 9},
+        {0, 9}
     }
 };
 static GPath *s_charge_path;
@@ -54,9 +52,19 @@ static const GPathInfo CHARGE_ICON = {
         {9, 0}
     }
 };
+static GColor fg, bg, warn;
 
 void setup_battery(Layer *root) {
-  s_battery_layer = layer_create(GRect(123, 2, 19, 15));
+#ifdef PBL_COLOR
+  fg = GColorBlack;
+  bg = GColorYellow;
+  warn = GColorRed;
+#else
+  fg = GColorWhite;
+  bg = GColorBlack;
+  warn = bg;
+#endif
+  s_battery_layer = layer_create(GRect(121, 2, 19, 15));
   s_battery_path = gpath_create(&BATTERY_ICON);
   s_charge_path = gpath_create(&CHARGE_ICON);
   layer_set_update_proc(s_battery_layer, battery_update_proc);
@@ -78,30 +86,40 @@ void teardown_battery() {
 }
 
 static void battery_update_proc(Layer *layer, GContext *ctx) {
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-  gpath_draw_outline(ctx, s_battery_path);
+  graphics_context_set_stroke_color(ctx, fg);
 
-  GRect battery_fill = GRect(2, 4, 12, 5);
+  GRect battery_fill = GRect(2, 4, 10, 4);
   switch (s_battery_state) {
     case BATTERY_CHARGING:
     case BATTERY_CHARGED:
-      graphics_context_set_fill_color(ctx, GColorWhite);
+      graphics_context_set_fill_color(ctx, fg);
       break;
 
     case BATTERY_UNKNOWN:
-      graphics_context_set_fill_color(ctx, GColorBlack);
+      graphics_context_set_fill_color(ctx, warn);
       break;
 
     default:
-      graphics_context_set_fill_color(ctx, GColorWhite);
-      battery_fill.size.w = ((int)(battery_fill.size.w) * (int)s_battery_state)/100;
+      graphics_context_set_fill_color(ctx, fg);
+      battery_fill.size.w = ((int)(battery_fill.size.w) * (int)(s_battery_state))/100;
+      if (battery_fill.size.w < 1) {
+        // basalt sets state to 0 when it gets down to 10!
+        battery_fill.size.w = 1;
+      }
+#ifdef PBL_COLOR
+      if (s_battery_state <= 20) {
+        graphics_context_set_fill_color(ctx, warn);
+        graphics_context_set_stroke_color(ctx, warn);
+      }
+#endif
   }
+  gpath_draw_outline(ctx, s_battery_path);
   graphics_fill_rect(ctx, battery_fill, 0, 0);
 
   if (s_battery_state == BATTERY_CHARGING ||
       s_battery_state == BATTERY_CHARGED) {
-    graphics_context_set_stroke_color(ctx, GColorBlack);
-    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_context_set_stroke_color(ctx, bg);
+    graphics_context_set_fill_color(ctx, fg);
     gpath_draw_filled(ctx, s_charge_path);
     gpath_draw_outline(ctx, s_charge_path);
   }
@@ -113,7 +131,7 @@ static void battery_changed_callback(BatteryChargeState charge_state) {
     battery_state = BATTERY_CHARGING;
   } else if (charge_state.is_plugged) {
     battery_state = BATTERY_CHARGED;
-  } else if (charge_state.charge_percent >= 90) {
+  } else if (charge_state.charge_percent > 90) {
     battery_state = 100;
   } else {
     battery_state = (int)charge_state.charge_percent;

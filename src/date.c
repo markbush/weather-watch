@@ -37,7 +37,7 @@
 void update_date_display();
 void set_date_font();
 
-extern struct tm *pebble_time;
+extern struct tm pebble_time;
 
 static TextLayer *s_date_layer;
 GFont s_date_font;
@@ -46,6 +46,8 @@ GFont s_date_font_gr;
 GFont s_date_font_ru;
 GFont s_date_font_cn;
 int s_locale = LC_EN;
+static GColor fg;
+static int frame_base;
 
 static char DAY[NUM_LOCALES][7][12] = {
   {"Нд ", "Пн ", "Вт ", "Ср ", "Чт ", "Пт ", "Сб "}, // LC_BG Bulgarian
@@ -117,9 +119,16 @@ static char MONTH[NUM_LOCALES][12][12] = {
 };
 
 void setup_date(Layer *root) {
-  s_date_layer = text_layer_create(GRect(0, 62, 144, 32));
+#ifdef PBL_COLOR
+  frame_base = 53;
+  fg = GColorRed;
+#else
+  frame_base = 62;
+  fg = GColorWhite;
+#endif
+  s_date_layer = text_layer_create(GRect(0, frame_base, 144, 32));
   text_layer_set_background_color(s_date_layer, GColorClear);
-  text_layer_set_text_color(s_date_layer, GColorWhite);
+  text_layer_set_text_color(s_date_layer, fg);
   s_date_font_en = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
   s_date_font_gr = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_GR_18));
   s_date_font_ru = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_RU_20));
@@ -146,9 +155,9 @@ void update_date_display() {
   // Create a long-lived buffer
   static char day_date_buffer[BUF_LEN];
 
-  char *wday = DAY[s_locale][pebble_time->tm_wday];
-  int mday = pebble_time->tm_mday;
-  char *mon = MONTH[s_locale][pebble_time->tm_mon];
+  char *wday = DAY[s_locale][pebble_time.tm_wday];
+  int mday = pebble_time.tm_mday;
+  char *mon = MONTH[s_locale][pebble_time.tm_mon];
   snprintf(day_date_buffer, sizeof(day_date_buffer), "%s %d %s", wday, mday, mon);
   set_date_font();
   text_layer_set_text(s_date_layer, day_date_buffer);
@@ -156,12 +165,12 @@ void update_date_display() {
 
 void set_date_font() {
   GFont new_font = s_date_font_en;
-  GRect frame = GRect(0, 62, 144, 32);
+  GRect frame = GRect(0, frame_base, 144, 32);
   switch (s_locale) {
   case LC_GR:
     ;
     new_font = s_date_font_gr;
-    frame = GRect(0, 67, 144, 32);
+    frame = GRect(0, frame_base+5, 144, 32);
     break;
   case LC_BG:
   case LC_BY:
@@ -170,13 +179,13 @@ void set_date_font() {
   case LC_UA:
     ;
     new_font = s_date_font_ru;
-    frame = GRect(0, 67, 144, 32);
+    frame = GRect(0, frame_base+5, 144, 32);
     break;
   case LC_CN:
   case LC_JP:
     ;
     new_font = s_date_font_cn;
-    frame = GRect(0, 71, 144, 32);
+    frame = GRect(0, frame_base+9, 144, 32);
     break;
   }
   if (s_date_font != new_font) {

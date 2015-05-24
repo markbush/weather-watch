@@ -29,9 +29,18 @@ static const GPathInfo BLUETOOTH_ICON = {
         {-1, 10}
     }
 };
+static GColor fg, bg;
 
 void setup_bluetooth(Layer *root) {
-  s_bluetooth_layer = layer_create(GRect(4, 4, 144, 12));
+#ifdef PBL_COLOR
+  s_bluetooth_layer = layer_create(GRect(132, 17, 8, 12));
+  fg = GColorBlue;
+  bg = GColorYellow;
+#else
+  s_bluetooth_layer = layer_create(GRect(4, 4, 8, 12));
+  fg = GColorWhite;
+  bg = GColorBlack;
+#endif
   s_bluetooth_path = gpath_create(&BLUETOOTH_ICON);
   layer_set_update_proc(s_bluetooth_layer, bluetooth_update_proc);
   layer_add_child(root, s_bluetooth_layer);
@@ -53,9 +62,9 @@ static void bluetooth_update_proc(Layer *layer, GContext *ctx) {
   }
 
   if (s_bluetooth_state == BLUETOOTH_CONNECTED) {
-    graphics_context_set_stroke_color(ctx, GColorWhite);
+    graphics_context_set_stroke_color(ctx, fg);
   } else {
-    graphics_context_set_stroke_color(ctx, GColorBlack);
+    graphics_context_set_stroke_color(ctx, bg);
   }
   gpath_draw_outline(ctx, s_bluetooth_path);
 }
