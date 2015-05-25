@@ -21,6 +21,12 @@ function weatherCallback(responseText) {
   if (typeof json.main !== 'undefined') {
     dictionary.temperature = Math.round(json.main.temp - 273.15);
     dictionary.conditions = json.weather[0].id;
+    var nightTime = 1;
+    var now = Math.round((new Date()).getTime() / 1000);
+    if (now >= json.sys.sunrise && now <= json.sys.sunset) {
+      nightTime = 0;
+    }
+    dictionary.nightTime = nightTime;
   } else if (json.message) {
     console.log("No weather available: " + json.message);
   } else {

@@ -18,6 +18,7 @@ uint32_t s_temperature_unit = CELSIUS;
 int s_temperature_showing = 0;
 int s_weather_showing = 0;
 int s_forecast_type = FORECAST_HOURLY;
+int s_night_time = 0;
 
 #ifdef PBL_COLOR
 void get_forecast();
@@ -28,6 +29,7 @@ static TextLayer *s_temperature_scale_text_layer[3];
 static TextLayer *s_forecast_text_layer[6];
 static Layer *s_forecast_temperature_layer[6];
 
+extern void set_weather_background();
 static void temp_scale_update_proc(Layer *layer, GContext *ctx);
 static void forecast_temperature_update_proc(Layer *layer, GContext *ctx);
 int16_t temp_width[144] = {
@@ -43,7 +45,7 @@ int16_t temp_width[144] = {
 };
 GColor temp_colour[13];
 int temp_value[2][3] = {{0, 10, 20}, {30, 50, 70}};
-int temp_scale_y_offset[3] = {124, 74, 24};
+int temp_scale_y_offset[3] = {123, 73, 23};
 int forecast_title[6];
 int forecast_temp_min[6];
 int forecast_temp_max[6];
@@ -207,6 +209,8 @@ void update_weather_temperature_display() {
 }
 
 void update_weather(int update_type) {
+  static int night_time = 0;
+
   if (update_type == 0) {
     if (s_temperature_showing == 0) {
       layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), false);
@@ -223,6 +227,10 @@ void update_weather(int update_type) {
     } else if (update_type == 2) {
       layer_mark_dirty(s_forecast_temperature_layer[i]);
     }
+  }
+  if (update_type == 4 && s_night_time != night_time) {
+    night_time = s_night_time;
+    set_weather_background();
   }
 #else
   if (update_type == 0) {
@@ -285,7 +293,6 @@ static void temp_scale_update_proc(Layer *layer, GContext *ctx) {
 static void forecast_temperature_update_proc(Layer *layer, GContext *ctx) {
   for (int i = 0; i < 6; i++) {
     if (layer == s_forecast_temperature_layer[i]) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Update temp: %d", i);
       int temp_scale = temp_to_scale(forecast_temp_max[i]);
       int colour_index = scale_to_index(temp_scale);
       graphics_context_set_fill_color(ctx, temp_colour[colour_index]);

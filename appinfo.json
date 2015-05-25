@@ -27,7 +27,14 @@
     "forecastTempMax2": 24,
     "forecastTempMax3": 25,
     "forecastTempMax4": 26,
-    "forecastTempMax5": 27
+    "forecastTempMax5": 27,
+    "forecastWeather0": 28,
+    "forecastWeather1": 29,
+    "forecastWeather2": 30,
+    "forecastWeather3": 31,
+    "forecastWeather4": 32,
+    "forecastWeather5": 33,
+    "nightTime": 34
   },
   "capabilities": [
     "location",
@@ -64,6 +71,12 @@
       {
         "file": "images/background-day-clear.png",
         "name": "IMAGE_BACKGROUND_DAY_CLEAR",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-clear.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_CLEAR",
         "type": "png",
         "targetPlatforms": [ "basalt" ]
       },

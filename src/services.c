@@ -28,6 +28,13 @@
 #define KEY_FORECAST_TEMP_MAX_3 25
 #define KEY_FORECAST_TEMP_MAX_4 26
 #define KEY_FORECAST_TEMP_MAX_5 27
+#define KEY_FORECAST_WEATHER_0 28
+#define KEY_FORECAST_WEATHER_1 29
+#define KEY_FORECAST_WEATHER_2 30
+#define KEY_FORECAST_WEATHER_3 31
+#define KEY_FORECAST_WEATHER_4 32
+#define KEY_FORECAST_WEATHER_5 33
+#define KEY_NIGHT_TIME 34
 
 extern void update_weather_conditions_display(uint32_t weather_state);
 extern void update_weather_temperature_display();
@@ -61,6 +68,7 @@ extern int s_locale;
 extern int s_temperature_showing;
 extern int s_weather_showing;
 extern int s_forecast_type;
+extern int s_night_time;
 
 void setup_remote_services() {
   app_message_register_inbox_received(inbox_received_callback);
@@ -118,6 +126,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   int offset;
   bool need_update_1 = false;
   bool need_update_2 = false;
+  bool need_update_4 = false;
 #endif
 
   // For all items
@@ -213,6 +222,11 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         need_update_2 = true;
       }
       break;
+    case KEY_NIGHT_TIME:
+      ;
+      s_night_time = (int)t->value->int32;
+      need_update_4 = true;
+      break;
 #endif
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
@@ -232,6 +246,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   }
   if (need_update_2) {
     update_weather(2);
+  }
+  if (need_update_4) {
+    update_weather(4);
   }
 #endif
 }

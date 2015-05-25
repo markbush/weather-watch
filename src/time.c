@@ -26,9 +26,9 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 #ifdef PBL_COLOR
   // Get weather forecast every half hour
   // but offset from weather update
-  //if (tick_time->tm_min % 30 == 3) {
+  if (tick_time->tm_min % 30 == 3) {
     get_forecast();
-  //}
+  }
 #endif
 }
 
