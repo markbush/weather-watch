@@ -8,6 +8,23 @@ static void hands_update_proc(Layer *layer, GContext *ctx);
 Layer *s_hands_layer;
 
 static GPath *s_minute_hand_path;
+static GPath *s_hour_hand_path;
+#ifdef PBL_COLOR
+static const GPathInfo MINUTE_HAND = {
+    3, (GPoint []){
+        {-2, -46},
+        {0, -64},
+        {2, -46}
+    }
+};
+static const GPathInfo HOUR_HAND = {
+    3, (GPoint []){
+        {-6, -47},
+        {0, -62},
+        {6, -47}
+    }
+};
+#else
 static const GPathInfo MINUTE_HAND = {
     3, (GPoint []){
         {-2, -52},
@@ -15,7 +32,6 @@ static const GPathInfo MINUTE_HAND = {
         {2, -52}
     }
 };
-static GPath *s_hour_hand_path;
 static const GPathInfo HOUR_HAND = {
     3, (GPoint []){
         {-6, -52},
@@ -23,6 +39,7 @@ static const GPathInfo HOUR_HAND = {
         {6, -52}
     }
 };
+#endif
 static GColor fg;
 
 void setup_hands(Layer *root) {
