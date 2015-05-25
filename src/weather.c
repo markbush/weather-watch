@@ -8,16 +8,20 @@ void update_weather_temperature_display();
 void update_weather();
 
 uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
-static TextLayer *s_temperature_layer;
+static TextLayer *s_temperature_text_layer;
 int s_temperature = 0;
 uint32_t s_temperature_unit = CELSIUS;
 int s_temperature_showing = 0;
 int s_weather_showing = 0;
 
 #ifdef PBL_COLOR
-static Layer *s_temperature_scale;
+static Layer *s_temperature_layer;
+static BitmapLayer *s_temperature_scale_layer;
+static GBitmap *s_temperature_scale_bitmap;
+static TextLayer *s_temperature_scale_text_layer[3];
+
 static void temp_scale_update_proc(Layer *layer, GContext *ctx);
-int16_t temp_width[] = {
+int16_t temp_width[144] = {
   69, 69, 63, 56, 52, 49, 46, 42, 42, 39, 34, 34, 34, 33, 31, 29,
   28, 27, 26, 24, 24, 23, 22, 21, 20, 18, 18, 17, 16, 15, 14, 14,
   13, 13, 12,  9,  9,  9,  9,  9,  8,  8 , 8,  6,  6,  6,  6,  5,
@@ -29,6 +33,8 @@ int16_t temp_width[] = {
   29, 31, 33, 34, 34, 34, 39, 42, 42, 46, 49, 52, 56, 63, 69, 69
 };
 GColor temp_colour[13];
+int temp_value[2][3] = {{0, 10, 20}, {30, 50, 70}};
+int temp_scale_y_offset[3] = {124, 74, 24};
 #else
 static BitmapLayer *s_conditions_layer;
 static GBitmap *s_conditions_bitmap;
@@ -37,9 +43,9 @@ static GBitmap *s_conditions_bitmap;
 void setup_weather(Layer *root) {
   // Create temperature Layers
 #ifdef PBL_COLOR
-  s_temperature_scale = layer_create(GRect(0, 0, 70, 144));
-  layer_add_child(root, s_temperature_scale);
-  layer_set_update_proc(s_temperature_scale, temp_scale_update_proc);
+  s_temperature_layer = layer_create(GRect(0, 0, 70, 144));
+  layer_add_child(root, s_temperature_layer);
+  layer_set_update_proc(s_temperature_layer, temp_scale_update_proc);
   temp_colour[0] = GColorWhite;
   temp_colour[1] = GColorCeleste;
   temp_colour[2] = GColorElectricBlue;
@@ -54,35 +60,52 @@ void setup_weather(Layer *root) {
   temp_colour[11] = GColorFolly;
   temp_colour[12] = GColorRed;
 
-  s_temperature_layer = text_layer_create(GRect(2, 0, 26, 10));
-  text_layer_set_font(s_temperature_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
-  text_layer_set_text_color(s_temperature_layer, GColorBlack);
-  text_layer_set_text_alignment(s_temperature_layer, GTextAlignmentRight);
-#else
-  s_temperature_layer = text_layer_create(GRect(0, 30, 144, 28));
-  text_layer_set_font(s_temperature_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
-  text_layer_set_text_color(s_temperature_layer, GColorWhite);
-  text_layer_set_text_alignment(s_temperature_layer, GTextAlignmentCenter);
-#endif
-  text_layer_set_background_color(s_temperature_layer, GColorClear);
-  layer_add_child(root, text_layer_get_layer(s_temperature_layer));
+  s_temperature_scale_layer = bitmap_layer_create(GRect(0, 0, 4, 144));
+  bitmap_layer_set_compositing_mode(s_temperature_scale_layer, GCompOpSet);
+  s_temperature_scale_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_TEMP_SCALE);
+  bitmap_layer_set_bitmap(s_temperature_scale_layer, s_temperature_scale_bitmap);
+  layer_add_child(root, bitmap_layer_get_layer(s_temperature_scale_layer));
 
-#ifdef PBL_COLOR
+  for (int i = 0; i < 3; i++) {
+    s_temperature_scale_text_layer[i] = text_layer_create(GRect(2,  temp_scale_y_offset[i], 10, 9));
+    text_layer_set_font(s_temperature_scale_text_layer[i], fonts_get_system_font(FONT_KEY_GOTHIC_09));
+    text_layer_set_text_color(s_temperature_scale_text_layer[i], GColorBlack);
+    text_layer_set_text_alignment(s_temperature_scale_text_layer[i], GTextAlignmentRight);
+    text_layer_set_background_color(s_temperature_scale_text_layer[i], GColorClear);
+    layer_add_child(root, text_layer_get_layer(s_temperature_scale_text_layer[i]));
+  }
+
+  s_temperature_text_layer = text_layer_create(GRect(2, 0, 26, 10));
+  text_layer_set_font(s_temperature_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
+  text_layer_set_text_color(s_temperature_text_layer, GColorBlack);
+  text_layer_set_text_alignment(s_temperature_text_layer, GTextAlignmentRight);
 #else
   // Create conditions Layer
   s_conditions_layer = bitmap_layer_create(GRect(56, 100, 32, 32));
   s_conditions_bitmap = gbitmap_create_with_resource(s_weather_state);
   bitmap_layer_set_bitmap(s_conditions_layer, s_conditions_bitmap);
   layer_add_child(root, bitmap_layer_get_layer(s_conditions_layer));
+
+  s_temperature_text_layer = text_layer_create(GRect(0, 30, 144, 28));
+  text_layer_set_font(s_temperature_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_text_color(s_temperature_text_layer, GColorWhite);
+  text_layer_set_text_alignment(s_temperature_text_layer, GTextAlignmentCenter);
 #endif
+  text_layer_set_background_color(s_temperature_text_layer, GColorClear);
+  layer_add_child(root, text_layer_get_layer(s_temperature_text_layer));
 
   update_weather();
 }
 
 void teardown_weather() {
-  text_layer_destroy(s_temperature_layer);
+  text_layer_destroy(s_temperature_text_layer);
 #ifdef PBL_COLOR
-  layer_destroy(s_temperature_scale);
+  layer_destroy(s_temperature_layer);
+  gbitmap_destroy(s_temperature_scale_bitmap);
+  bitmap_layer_destroy(s_temperature_scale_layer);
+  for (int i = 0; i < 3; i++) {
+    text_layer_destroy(s_temperature_scale_text_layer[i]);
+  }
 #else
   gbitmap_destroy(s_conditions_bitmap);
   bitmap_layer_destroy(s_conditions_layer);
@@ -119,6 +142,7 @@ void update_weather_conditions_display(uint32_t weather_state) {
 
 void update_weather_temperature_display() {
   static char temperature_buffer[8];
+  static char temp_scale_value_buffer[3][4];
 
   if (s_weather_state == RESOURCE_ID_IMAGE_ALERT
       || s_weather_state == RESOURCE_ID_IMAGE_LOCATION
@@ -140,9 +164,14 @@ void update_weather_temperature_display() {
 #endif
     }
   }
-  text_layer_set_text(s_temperature_layer, temperature_buffer);
+  text_layer_set_text(s_temperature_text_layer, temperature_buffer);
 #ifdef PBL_COLOR
-  layer_mark_dirty(s_temperature_scale);
+  for (int i = 0; i < 3; i++) {
+    int temp_mark = temp_value[s_temperature_unit][i];
+    snprintf(temp_scale_value_buffer[i], sizeof(temp_scale_value_buffer), "%d", temp_mark);
+    text_layer_set_text(s_temperature_scale_text_layer[i], temp_scale_value_buffer[i]);
+  }
+  layer_mark_dirty(s_temperature_layer);
 #endif
 }
 
@@ -150,9 +179,9 @@ void update_weather() {
 #ifdef PBL_COLOR
 #else
   if (s_temperature_showing == 0) {
-    layer_set_hidden(text_layer_get_layer(s_temperature_layer), false);
+    layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), false);
   } else {
-    layer_set_hidden(text_layer_get_layer(s_temperature_layer), true);
+    layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), true);
   }
   if (s_weather_showing == 0) {
     layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), false);

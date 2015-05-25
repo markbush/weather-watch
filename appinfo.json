@@ -49,6 +49,12 @@
         "targetPlatforms": [ "basalt" ]
       },
       {
+        "file": "images/temp-scale.png",
+        "name": "IMAGE_TEMP_SCALE",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
         "file": "images/alert.png",
         "name": "IMAGE_ALERT",
         "type": "png"
