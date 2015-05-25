@@ -86,8 +86,13 @@ Pebble.addEventListener('ready',
 // Listen for when an AppMessage is received
 Pebble.addEventListener('appmessage',
   function(e) {
-    //console.log("AppMessage received!");
-    getWeather();
+    //console.log("AppMessage received: " + JSON.stringify(e));
+    if (e.payload['0'] == 0) {
+      //console.log('Getting weather');
+      getWeather();
+    } else {
+      //console.log('Getting forecast');
+    }
   }
 );
 

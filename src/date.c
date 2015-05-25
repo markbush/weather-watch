@@ -1,7 +1,5 @@
 #include <pebble.h>
 
-#define BUF_LEN 40
-
 #define LC_BG  0
 #define LC_BY  1
 #define LC_CN  2
@@ -39,6 +37,10 @@ void set_date_font();
 
 extern struct tm pebble_time;
 
+#ifdef PBL_COLOR
+static TextLayer *s_day_layer;
+static TextLayer *s_month_layer;
+#endif
 static TextLayer *s_date_layer;
 GFont s_date_font;
 GFont s_date_font_en;
@@ -47,7 +49,6 @@ GFont s_date_font_ru;
 GFont s_date_font_cn;
 int s_locale = LC_EN;
 static GColor fg;
-static int frame_base;
 
 static char DAY[NUM_LOCALES][7][12] = {
   {"Нд ", "Пн ", "Вт ", "Ср ", "Чт ", "Пт ", "Сб "}, // LC_BG Bulgarian
@@ -119,23 +120,39 @@ static char MONTH[NUM_LOCALES][12][12] = {
 };
 
 void setup_date(Layer *root) {
-#ifdef PBL_COLOR
-  frame_base = 53;
-  fg = GColorRed;
-#else
-  frame_base = 62;
-  fg = GColorWhite;
-#endif
-  s_date_layer = text_layer_create(GRect(0, frame_base, 144, 32));
-  text_layer_set_background_color(s_date_layer, GColorClear);
-  text_layer_set_text_color(s_date_layer, fg);
   s_date_font_en = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
   s_date_font_gr = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_GR_18));
   s_date_font_ru = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_B_RU_20));
   s_date_font_cn = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CN_16));
-  set_date_font();
+#ifdef PBL_COLOR
+  fg = GColorRed;
+  s_day_layer = text_layer_create(GRect(0, 30, 144, 32));
+  text_layer_set_background_color(s_day_layer, GColorClear);
+  text_layer_set_text_color(s_day_layer, fg);
+  text_layer_set_text_alignment(s_day_layer, GTextAlignmentCenter);
+  layer_add_child(root, text_layer_get_layer(s_day_layer));
+
+  s_date_layer = text_layer_create(GRect(0, 53, 144, 32));
+  text_layer_set_background_color(s_date_layer, GColorClear);
+  text_layer_set_text_color(s_date_layer, fg);
+  text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
+  text_layer_set_font(s_date_layer, s_date_font_en);
+  layer_add_child(root, text_layer_get_layer(s_date_layer));
+
+  s_month_layer = text_layer_create(GRect(0, 76, 144, 32));
+  text_layer_set_background_color(s_month_layer, GColorClear);
+  text_layer_set_text_color(s_month_layer, fg);
+  text_layer_set_text_alignment(s_month_layer, GTextAlignmentCenter);
+  layer_add_child(root, text_layer_get_layer(s_month_layer));
+#else
+  fg = GColorWhite;
+  s_date_layer = text_layer_create(GRect(0, 62, 144, 32));
+  text_layer_set_background_color(s_date_layer, GColorClear);
+  text_layer_set_text_color(s_date_layer, fg);
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   layer_add_child(root, text_layer_get_layer(s_date_layer));
+#endif
+  set_date_font();
 }
 
 void teardown_date() {
@@ -148,29 +165,55 @@ void teardown_date() {
   if (s_date_font_cn) {
     fonts_unload_custom_font(s_date_font_cn);
   }
+#ifdef PBL_COLOR
+  text_layer_destroy(s_day_layer);
+  text_layer_destroy(s_month_layer);
+#endif
   text_layer_destroy(s_date_layer);
 }
 
 void update_date_display() {
   // Create a long-lived buffer
-  static char day_date_buffer[BUF_LEN];
+  static char day_date_buffer[40];
+  static char day_buffer[15];
+  static char date_buffer[10];
+  static char month_buffer[15];
 
   char *wday = DAY[s_locale][pebble_time.tm_wday];
   int mday = pebble_time.tm_mday;
   char *mon = MONTH[s_locale][pebble_time.tm_mon];
   snprintf(day_date_buffer, sizeof(day_date_buffer), "%s %d %s", wday, mday, mon);
+  snprintf(day_buffer, sizeof(day_buffer), "%s", wday);
+  snprintf(date_buffer, sizeof(date_buffer), "%d", mday);
+  snprintf(month_buffer, sizeof(month_buffer), "%s", mon);
   set_date_font();
+#ifdef PBL_COLOR
+  text_layer_set_text(s_day_layer, day_buffer);
+  text_layer_set_text(s_date_layer, date_buffer);
+  text_layer_set_text(s_month_layer, month_buffer);
+#else
   text_layer_set_text(s_date_layer, day_date_buffer);
+#endif
 }
 
 void set_date_font() {
   GFont new_font = s_date_font_en;
-  GRect frame = GRect(0, frame_base, 144, 32);
+#ifdef PBL_COLOR
+  GRect day_frame = GRect(0, 30, 144, 32);
+  GRect month_frame = GRect(0, 76, 144, 32);
+#else
+  GRect frame = GRect(0, 62, 144, 32);
+#endif
   switch (s_locale) {
   case LC_GR:
     ;
     new_font = s_date_font_gr;
-    frame = GRect(0, frame_base+5, 144, 32);
+#ifdef PBL_COLOR
+  day_frame = GRect(0, 35, 144, 32);
+  month_frame = GRect(0, 81, 144, 32);
+#else
+    frame = GRect(0, 67, 144, 32);
+#endif
     break;
   case LC_BG:
   case LC_BY:
@@ -179,18 +222,35 @@ void set_date_font() {
   case LC_UA:
     ;
     new_font = s_date_font_ru;
-    frame = GRect(0, frame_base+5, 144, 32);
+#ifdef PBL_COLOR
+  day_frame = GRect(0, 35, 144, 32);
+  month_frame = GRect(0, 81, 144, 32);
+#else
+    frame = GRect(0, 67, 144, 32);
+#endif
     break;
   case LC_CN:
   case LC_JP:
     ;
     new_font = s_date_font_cn;
-    frame = GRect(0, frame_base+9, 144, 32);
+#ifdef PBL_COLOR
+  day_frame = GRect(0, 39, 144, 32);
+  month_frame = GRect(0, 85, 144, 32);
+#else
+    frame = GRect(0, 71, 144, 32);
+#endif
     break;
   }
   if (s_date_font != new_font) {
     s_date_font = new_font;
+#ifdef PBL_COLOR
+  text_layer_set_font(s_day_layer, s_date_font);
+  layer_set_frame(text_layer_get_layer(s_day_layer), day_frame);
+  text_layer_set_font(s_month_layer, s_date_font);
+  layer_set_frame(text_layer_get_layer(s_month_layer), month_frame);
+#else
     text_layer_set_font(s_date_layer, s_date_font);
     layer_set_frame(text_layer_get_layer(s_date_layer), frame);
+#endif
   }
 }

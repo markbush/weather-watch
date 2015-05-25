@@ -22,6 +22,13 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     dict_write_uint8(iter, 0, 0);
     app_message_outbox_send();
   }
+  // Get weather forecast every half hour
+  if (tick_time->tm_min % 30 == 0) {
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+    dict_write_uint8(iter, 0, 1);
+    app_message_outbox_send();
+  }
 }
 
 void update_time(struct tm *tick_time) {
