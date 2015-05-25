@@ -35,6 +35,73 @@ function weatherCallback(responseText) {
   );
 }
 
+function hourlyForecastCallback(responseText) {
+  var json = {};
+  try {
+    json = JSON.parse(responseText);
+  } catch (e) { }
+  var dictionary = {
+    "conditions": 0
+  };
+  if (typeof json.list !== 'undefined') {
+    for (var i = 0; i < 6; i++) {
+      var item = json.list[i];
+      var date = new Date(item.dt * 1000);
+      var temp = Math.round(item.main.temp - 273.15);
+      var weather = item.weather[0].id;
+      dictionary['forecastTitle'+i] = date.getHours();
+      dictionary['forecastTempMin'+i] = temp;
+      dictionary['forecastTempMax'+i] = temp;
+      console.log("[" + date.getHours() + "] " + weather + " " + temp + "C");
+    }
+  } else if (json.message) {
+    console.log("No weather available: " + json.message);
+  } else {
+    console.log("Weather not available: " + responseText);
+  }
+  Pebble.sendAppMessage(dictionary,
+    function(e) {
+    },
+    function(e) {
+      console.log("Error sending weather info to Pebble!");
+    }
+  );
+}
+
+function dailyForecastCallback(responseText) {
+  var json = {};
+  try {
+    json = JSON.parse(responseText);
+  } catch (e) { }
+  var dictionary = {
+    "conditions": 0
+  };
+  if (typeof json.list !== 'undefined') {
+    for (var i = 0; i < 6; i++) {
+      var item = json.list[i];
+      var date = new Date(item.dt * 1000);
+      var tempMin = Math.round(item.temp.min - 273.15);
+      var tempMax = Math.round(item.temp.max - 273.15);
+      var weather = item.weather[0].id;
+      dictionary['forecastTitle'+i] = date.getDate();
+      dictionary['forecastTempMin'+i] = tempMin;
+      dictionary['forecastTempMax'+i] = tempMax;
+      console.log("[" + date.getDate() + "] " + weather + " " + tempMin + "C - " + tempMax + "C");
+    }
+  } else if (json.message) {
+    console.log("No weather available: " + json.message);
+  } else {
+    console.log("Weather not available: " + responseText);
+  }
+  Pebble.sendAppMessage(dictionary,
+    function(e) {
+    },
+    function(e) {
+      console.log("Error sending weather info to Pebble!");
+    }
+  );
+}
+
 function locationSuccess(pos) {
   // Construct URL
   var url = "http://api.openweathermap.org/data/2.5/weather?lat=" +
@@ -43,6 +110,26 @@ function locationSuccess(pos) {
   // Send request to OpenWeatherMap
   //console.log("URL: " + url);
   xhrRequest(url, 'GET', weatherCallback);
+}
+
+function hourlyForecastLocationSuccess(pos) {
+  // Construct URL
+  var url = "http://api.openweathermap.org/data/2.5/forecast?lat=" +
+      pos.coords.latitude + "&lon=" + pos.coords.longitude;
+
+  // Send request to OpenWeatherMap
+  //console.log("URL: " + url);
+  xhrRequest(url, 'GET', hourlyForecastCallback);
+}
+
+function dailyForecastLocationSuccess(pos) {
+  // Construct URL
+  var url = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" +
+      pos.coords.latitude + "&lon=" + pos.coords.longitude;
+
+  // Send request to OpenWeatherMap
+  //console.log("URL: " + url);
+  xhrRequest(url, 'GET', dailyForecastCallback);
 }
 
 function locationError(err) {
@@ -73,6 +160,18 @@ function getWeather() {
   );
 }
 
+function getForecast(forecastType) {
+  var successCallback = hourlyForecastLocationSuccess;
+  if (forecastType == 2) {
+    successCallback = dailyForecastLocationSuccess;
+  }
+  navigator.geolocation.getCurrentPosition(
+    successCallback,
+    locationError,
+    {timeout: 15000, maximumAge: 60000}
+  );
+}
+
 // Listen for when the watchface is opened
 Pebble.addEventListener('ready',
   function(e) {
@@ -80,6 +179,7 @@ Pebble.addEventListener('ready',
 
     // Get the initial weather
     getWeather();
+    getForecast();
   }
 );
 
@@ -92,6 +192,7 @@ Pebble.addEventListener('appmessage',
       getWeather();
     } else {
       //console.log('Getting forecast');
+      getForecast(e.payload['0']);
     }
   }
 );

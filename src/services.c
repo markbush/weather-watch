@@ -9,6 +9,25 @@
 #define KEY_LANGUAGE 6
 #define KEY_SHOW_TEMP 7
 #define KEY_SHOW_WEATHER 8
+#define KEY_FORECAST_TYPE 9
+#define KEY_FORECAST_TITLE_0 10
+#define KEY_FORECAST_TITLE_1 11
+#define KEY_FORECAST_TITLE_2 12
+#define KEY_FORECAST_TITLE_3 13
+#define KEY_FORECAST_TITLE_4 14
+#define KEY_FORECAST_TITLE_5 15
+#define KEY_FORECAST_TEMP_MIN_0 16
+#define KEY_FORECAST_TEMP_MIN_1 17
+#define KEY_FORECAST_TEMP_MIN_2 18
+#define KEY_FORECAST_TEMP_MIN_3 19
+#define KEY_FORECAST_TEMP_MIN_4 20
+#define KEY_FORECAST_TEMP_MIN_5 21
+#define KEY_FORECAST_TEMP_MAX_0 22
+#define KEY_FORECAST_TEMP_MAX_1 23
+#define KEY_FORECAST_TEMP_MAX_2 24
+#define KEY_FORECAST_TEMP_MAX_3 25
+#define KEY_FORECAST_TEMP_MAX_4 26
+#define KEY_FORECAST_TEMP_MAX_5 27
 
 extern void update_weather_conditions_display(uint32_t weather_state);
 extern void update_weather_temperature_display();
@@ -16,6 +35,13 @@ extern void update_battery();
 extern void update_bluetooth();
 extern void update_date_display();
 extern void update_weather();
+#ifdef PBL_COLOR
+extern void get_forecast();
+
+extern int forecast_title[6];
+extern int forecast_temp_min[6];
+extern int forecast_temp_max[6];
+#endif
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void inbox_dropped_callback(AppMessageResult reason, void *context);
@@ -34,6 +60,7 @@ extern int s_bluetooth_disconnect;
 extern int s_locale;
 extern int s_temperature_showing;
 extern int s_weather_showing;
+extern int s_forecast_type;
 
 void setup_remote_services() {
   app_message_register_inbox_received(inbox_received_callback);
@@ -67,6 +94,9 @@ void load_config() {
   if (persist_exists(KEY_SHOW_WEATHER)) {
     s_weather_showing = persist_read_int(KEY_SHOW_WEATHER);
   }
+  if (persist_exists(KEY_FORECAST_TYPE)) {
+    s_forecast_type = persist_read_int(KEY_FORECAST_TYPE);
+  }
 }
 
 void save_config() {
@@ -77,11 +107,18 @@ void save_config() {
   persist_write_int(KEY_LANGUAGE, s_locale);
   persist_write_int(KEY_SHOW_TEMP, s_temperature_showing);
   persist_write_int(KEY_SHOW_WEATHER, s_weather_showing);
+  persist_write_int(KEY_FORECAST_TYPE, s_forecast_type);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Read first item
   Tuple *t = dict_read_first(iterator);
+  bool need_update_0 = false;
+#ifdef PBL_COLOR
+  int offset;
+  bool need_update_1 = false;
+  bool need_update_2 = false;
+#endif
 
   // For all items
   while (t != NULL) {
@@ -124,13 +161,59 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     case KEY_SHOW_TEMP:
       ;
       s_temperature_showing = (int)t->value->int32;
-      update_weather();
+      need_update_0 = true;
       break;
     case KEY_SHOW_WEATHER:
       ;
       s_weather_showing = (int)t->value->int32;
-      update_weather();
+      need_update_0 = true;
       break;
+#ifdef PBL_COLOR
+    case KEY_FORECAST_TYPE:
+      ;
+      s_forecast_type = (int)t->value->int32;
+      get_forecast();
+      break;
+    case KEY_FORECAST_TITLE_0:
+    case KEY_FORECAST_TITLE_1:
+    case KEY_FORECAST_TITLE_2:
+    case KEY_FORECAST_TITLE_3:
+    case KEY_FORECAST_TITLE_4:
+    case KEY_FORECAST_TITLE_5:
+      ;
+      offset = t->key - KEY_FORECAST_TITLE_0;
+      if (forecast_title[offset] != (int)t->value->int32) {
+        forecast_title[offset] = (int)t->value->int32;
+        need_update_1 = true;
+      }
+      break;
+    case KEY_FORECAST_TEMP_MIN_0:
+    case KEY_FORECAST_TEMP_MIN_1:
+    case KEY_FORECAST_TEMP_MIN_2:
+    case KEY_FORECAST_TEMP_MIN_3:
+    case KEY_FORECAST_TEMP_MIN_4:
+    case KEY_FORECAST_TEMP_MIN_5:
+      ;
+      offset = t->key - KEY_FORECAST_TEMP_MIN_0;
+      if (forecast_temp_min[offset] != (int)t->value->int32) {
+        forecast_temp_min[offset] = (int)t->value->int32;
+        need_update_2 = true;
+      }
+      break;
+    case KEY_FORECAST_TEMP_MAX_0:
+    case KEY_FORECAST_TEMP_MAX_1:
+    case KEY_FORECAST_TEMP_MAX_2:
+    case KEY_FORECAST_TEMP_MAX_3:
+    case KEY_FORECAST_TEMP_MAX_4:
+    case KEY_FORECAST_TEMP_MAX_5:
+      ;
+      offset = t->key - KEY_FORECAST_TEMP_MAX_0;
+      if (forecast_temp_max[offset] != (int)t->value->int32) {
+        forecast_temp_max[offset] = (int)t->value->int32;
+        need_update_2 = true;
+      }
+      break;
+#endif
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
       break;
@@ -139,6 +222,18 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Look for next item
     t = dict_read_next(iterator);
   }
+
+  if (need_update_0) {
+    update_weather(0);
+  }
+#ifdef PBL_COLOR
+  if (need_update_1) {
+    update_weather(1);
+  }
+  if (need_update_2) {
+    update_weather(2);
+  }
+#endif
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {

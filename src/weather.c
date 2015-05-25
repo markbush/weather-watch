@@ -3,9 +3,13 @@
 #define CELSIUS 0
 #define FAHRENHEIT 1
 
+#define FORECAST_HOURLY 1
+#define FORECAST_DAILY  2
+
 void update_weather_conditions_display(uint32_t weather_state);
 void update_weather_temperature_display();
 void update_weather();
+void get_weather();
 
 uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
 static TextLayer *s_temperature_text_layer;
@@ -13,14 +17,19 @@ int s_temperature = 0;
 uint32_t s_temperature_unit = CELSIUS;
 int s_temperature_showing = 0;
 int s_weather_showing = 0;
+int s_forecast_type = FORECAST_HOURLY;
 
 #ifdef PBL_COLOR
+void get_forecast();
 static Layer *s_temperature_layer;
 static BitmapLayer *s_temperature_scale_layer;
 static GBitmap *s_temperature_scale_bitmap;
 static TextLayer *s_temperature_scale_text_layer[3];
+static TextLayer *s_forecast_text_layer[6];
+static Layer *s_forecast_temperature_layer[6];
 
 static void temp_scale_update_proc(Layer *layer, GContext *ctx);
+static void forecast_temperature_update_proc(Layer *layer, GContext *ctx);
 int16_t temp_width[144] = {
   69, 69, 63, 56, 52, 49, 46, 42, 42, 39, 34, 34, 34, 33, 31, 29,
   28, 27, 26, 24, 24, 23, 22, 21, 20, 18, 18, 17, 16, 15, 14, 14,
@@ -35,6 +44,9 @@ int16_t temp_width[144] = {
 GColor temp_colour[13];
 int temp_value[2][3] = {{0, 10, 20}, {30, 50, 70}};
 int temp_scale_y_offset[3] = {124, 74, 24};
+int forecast_title[6];
+int forecast_temp_min[6];
+int forecast_temp_max[6];
 #else
 static BitmapLayer *s_conditions_layer;
 static GBitmap *s_conditions_bitmap;
@@ -67,12 +79,25 @@ void setup_weather(Layer *root) {
   layer_add_child(root, bitmap_layer_get_layer(s_temperature_scale_layer));
 
   for (int i = 0; i < 3; i++) {
-    s_temperature_scale_text_layer[i] = text_layer_create(GRect(2,  temp_scale_y_offset[i], 10, 9));
+    s_temperature_scale_text_layer[i] = text_layer_create(GRect(2, temp_scale_y_offset[i], 10, 9));
     text_layer_set_font(s_temperature_scale_text_layer[i], fonts_get_system_font(FONT_KEY_GOTHIC_09));
     text_layer_set_text_color(s_temperature_scale_text_layer[i], GColorBlack);
     text_layer_set_text_alignment(s_temperature_scale_text_layer[i], GTextAlignmentRight);
     text_layer_set_background_color(s_temperature_scale_text_layer[i], GColorClear);
     layer_add_child(root, text_layer_get_layer(s_temperature_scale_text_layer[i]));
+  }
+
+  for (int i = 0; i < 6; i++) {
+    s_forecast_temperature_layer[i] = layer_create(GRect((i * 24), 158, 24, 10));
+    layer_set_update_proc(s_forecast_temperature_layer[i], forecast_temperature_update_proc);
+    layer_add_child(root, s_forecast_temperature_layer[i]);
+
+    s_forecast_text_layer[i] = text_layer_create(GRect((i * 24), 158, 10, 10));
+    text_layer_set_font(s_forecast_text_layer[i], fonts_get_system_font(FONT_KEY_GOTHIC_09));
+    text_layer_set_text_color(s_forecast_text_layer[i], GColorBlack);
+    text_layer_set_text_alignment(s_forecast_text_layer[i], GTextAlignmentRight);
+    text_layer_set_background_color(s_forecast_text_layer[i], GColorClear);
+    layer_add_child(root, text_layer_get_layer(s_forecast_text_layer[i]));
   }
 
   s_temperature_text_layer = text_layer_create(GRect(2, 0, 26, 10));
@@ -105,6 +130,10 @@ void teardown_weather() {
   bitmap_layer_destroy(s_temperature_scale_layer);
   for (int i = 0; i < 3; i++) {
     text_layer_destroy(s_temperature_scale_text_layer[i]);
+  }
+  for (int i = 0; i < 6; i++) {
+    text_layer_destroy(s_forecast_text_layer[i]);
+    layer_destroy(s_forecast_temperature_layer[i]);
   }
 #else
   gbitmap_destroy(s_conditions_bitmap);
@@ -142,7 +171,9 @@ void update_weather_conditions_display(uint32_t weather_state) {
 
 void update_weather_temperature_display() {
   static char temperature_buffer[8];
+#ifdef PBL_COLOR
   static char temp_scale_value_buffer[3][4];
+#endif
 
   if (s_weather_state == RESOURCE_ID_IMAGE_ALERT
       || s_weather_state == RESOURCE_ID_IMAGE_LOCATION
@@ -175,40 +206,95 @@ void update_weather_temperature_display() {
 #endif
 }
 
-void update_weather() {
-#ifdef PBL_COLOR
-#else
-  if (s_temperature_showing == 0) {
-    layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), false);
-  } else {
-    layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), true);
+void update_weather(int update_type) {
+  if (update_type == 0) {
+    if (s_temperature_showing == 0) {
+      layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), false);
+    } else {
+      layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), true);
+    }
   }
-  if (s_weather_showing == 0) {
-    layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), false);
-  } else {
-    layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), true);
+#ifdef PBL_COLOR
+  static char forecast_title_buffer[6][4];
+  for (int i = 0; i < 6; i++) {
+    if (update_type == 1) {
+      snprintf(forecast_title_buffer[i], sizeof(forecast_title_buffer), "%d", forecast_title[i]);
+      text_layer_set_text(s_forecast_text_layer[i], forecast_title_buffer[i]);
+    } else if (update_type == 2) {
+      layer_mark_dirty(s_forecast_temperature_layer[i]);
+    }
+  }
+#else
+  if (update_type == 0) {
+    if (s_weather_showing == 0) {
+      layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), false);
+    } else {
+      layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), true);
+    }
   }
 #endif
 }
 
+void get_weather() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_uint8(iter, 0, 0);
+  app_message_outbox_send();
+}
+
 #ifdef PBL_COLOR
-static void temp_scale_update_proc(Layer *layer, GContext *ctx) {
-  int temp_scale = (s_temperature + 4) * 144 / 29;
+void get_forecast() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_uint8(iter, 0, s_forecast_type);
+  s_forecast_type = 3 - s_forecast_type;
+  app_message_outbox_send();
+}
+
+static int temp_to_scale(int temperature) {
+  int temp_scale = (temperature + 4) * 144 / 29;
   if (temp_scale < 0) {
     temp_scale = 0;
   }
   if (temp_scale > 143) {
     temp_scale = 143;
   }
+  return temp_scale;
+}
+
+static int scale_to_index(int scale) {
+  int colour_index = scale / 11;
+  if (colour_index > 12) {
+    colour_index = 12;
+  }
+  return colour_index;
+}
+
+static void temp_scale_update_proc(Layer *layer, GContext *ctx) {
+  int temp_scale = temp_to_scale(s_temperature);
   for (int i = 0; i < temp_scale; i++) {
     int line_width = temp_width[i];
     if (line_width > 0) {
-      int colour_index = i / 11;
-      if (colour_index > 12) {
-        colour_index = 12;
-      }
+      int colour_index = scale_to_index(i);
       graphics_context_set_stroke_color(ctx, temp_colour[colour_index]);
       graphics_draw_line(ctx, GPoint(0, 143-i), GPoint(line_width, 143-i));
+    }
+  }
+}
+
+static void forecast_temperature_update_proc(Layer *layer, GContext *ctx) {
+  for (int i = 0; i < 6; i++) {
+    if (layer == s_forecast_temperature_layer[i]) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "Update temp: %d", i);
+      int temp_scale = temp_to_scale(forecast_temp_max[i]);
+      int colour_index = scale_to_index(temp_scale);
+      graphics_context_set_fill_color(ctx, temp_colour[colour_index]);
+      graphics_fill_rect(ctx, GRect(0, 0, 24, 5), 0, GCornerNone);
+
+      temp_scale = temp_to_scale(forecast_temp_min[i]);
+      colour_index = scale_to_index(temp_scale);
+      graphics_context_set_fill_color(ctx, temp_colour[colour_index]);
+      graphics_fill_rect(ctx, GRect(0, 5, 24, 5), 0, GCornerNone);
     }
   }
 }

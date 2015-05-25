@@ -1,6 +1,10 @@
 #include <pebble.h>
 
 extern void update_date_display();
+extern void get_weather();
+#ifdef PBL_COLOR
+extern void get_forecast();
+#endif
 extern Layer *s_hands_layer;
 extern TextLayer *s_date_layer;
 
@@ -17,18 +21,15 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time(tick_time);
   // Get weather update every 10 minutes
   if (tick_time->tm_min % 10 == 0) {
-    DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    dict_write_uint8(iter, 0, 0);
-    app_message_outbox_send();
+    get_weather();
   }
+#ifdef PBL_COLOR
   // Get weather forecast every half hour
-  if (tick_time->tm_min % 30 == 0) {
-    DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    dict_write_uint8(iter, 0, 1);
-    app_message_outbox_send();
-  }
+  // but offset from weather update
+  //if (tick_time->tm_min % 30 == 3) {
+    get_forecast();
+  //}
+#endif
 }
 
 void update_time(struct tm *tick_time) {
