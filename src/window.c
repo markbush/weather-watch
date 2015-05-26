@@ -20,8 +20,9 @@ static void main_window_unload(Window *window);
 static void setup_background(Layer *root);
 static void teardown_background();
 
-void set_weather_background();
-extern int g_night_time;
+#ifdef PBL_COLOR
+void set_weather_background(uint32_t background_resource);
+#endif
 
 static Window *s_main_window;
 static BitmapLayer *s_background_layer;
@@ -77,16 +78,12 @@ static void teardown_background() {
   bitmap_layer_destroy(s_background_layer);
 }
 
-void set_weather_background() {
 #ifdef PBL_COLOR
+void set_weather_background(uint32_t background_resource) {
   if (s_background_bitmap) {
     gbitmap_destroy(s_background_bitmap);
   }
-  if (g_night_time) {
-    s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLEAR);
-  } else {
-    s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR);
-  }
+  s_background_bitmap = gbitmap_create_with_resource(background_resource);
   bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
-#endif
 }
+#endif

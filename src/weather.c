@@ -6,12 +6,11 @@
 #define FORECAST_HOURLY 1
 #define FORECAST_DAILY  2
 
-void update_weather_conditions_display(uint32_t weather_state);
+void update_weather_conditions_display(int weather_index);
 void update_weather_temperature_display();
-void update_weather();
+void update_weather(int update_type);
 void get_weather();
 
-static uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
 static TextLayer *s_temperature_text_layer;
 int g_temperature = 0;
 uint32_t g_temperature_unit = CELSIUS;
@@ -29,7 +28,7 @@ static TextLayer *s_temperature_scale_text_layer[3];
 static TextLayer *s_forecast_text_layer[6];
 static Layer *s_forecast_temperature_layer[6];
 
-extern void set_weather_background();
+extern void set_weather_background(uint32_t background_resource);
 static void temp_scale_update_proc(Layer *layer, GContext *ctx);
 static void forecast_temperature_update_proc(Layer *layer, GContext *ctx);
 int16_t temp_width[144] = {
@@ -49,9 +48,59 @@ int temp_scale_y_offset[3] = {123, 73, 23};
 int g_forecast_title[6];
 int g_forecast_temp_min[6];
 int g_forecast_temp_max[6];
+int g_forecast_weather[6];
+extern int g_night_time;
+static uint32_t s_weather_state = RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR;
+static int s_weather_index = 0;
+static uint32_t weather_resource_day[13] = {
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_QUERY,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_ALERT,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_LOCATION,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLOUD_FEW,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLOUD_SCATTERED,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLOUD_BROKEN,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_THUNDERSTORM,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_RAIN_LIGHT,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_RAIN_HEAVY,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_SNOW,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_MIST,
+  RESOURCE_ID_IMAGE_BACKGROUND_DAY_WIND
+};
+static uint32_t weather_resource_night[13] = {
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_QUERY,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_ALERT,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_LOCATION,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLEAR,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLOUD_FEW,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLOUD_SCATTERED,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLOUD_BROKEN,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_THUNDERSTORM,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_RAIN_LIGHT,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_RAIN_HEAVY,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_SNOW,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_MIST,
+  RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_WIND
+};
 #else
 static BitmapLayer *s_conditions_layer;
 static GBitmap *s_conditions_bitmap;
+static uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
+static uint32_t weather_resource[13] = {
+  RESOURCE_ID_IMAGE_QUERY,
+  RESOURCE_ID_IMAGE_ALERT,
+  RESOURCE_ID_IMAGE_LOCATION,
+  RESOURCE_ID_IMAGE_CLEAR,
+  RESOURCE_ID_IMAGE_CLOUDS_FEW,
+  RESOURCE_ID_IMAGE_CLOUDS_SCATTERED,
+  RESOURCE_ID_IMAGE_CLOUDS_BROKEN,
+  RESOURCE_ID_IMAGE_THUNDERSTORM,
+  RESOURCE_ID_IMAGE_RAIN_LIGHT,
+  RESOURCE_ID_IMAGE_RAIN_HEAVY,
+  RESOURCE_ID_IMAGE_SNOW,
+  RESOURCE_ID_IMAGE_MIST,
+  RESOURCE_ID_IMAGE_WIND
+};
 #endif
 
 void setup_weather(Layer *root) {
@@ -121,7 +170,7 @@ void setup_weather(Layer *root) {
   text_layer_set_background_color(s_temperature_text_layer, GColorClear);
   layer_add_child(root, text_layer_get_layer(s_temperature_text_layer));
 
-  update_weather();
+  update_weather(0);
 }
 
 void teardown_weather() {
@@ -143,12 +192,21 @@ void teardown_weather() {
 #endif
 }
 
-void update_weather_conditions_display(uint32_t weather_state) {
+void update_weather_conditions_display(int weather_index) {
   static int failures = 0;
+  uint32_t weather_state;
+#ifdef PBL_COLOR
+  if (g_night_time) {
+    weather_state = weather_resource_night[weather_index];
+  } else {
+    weather_state = weather_resource_day[weather_index];
+  }
+  s_weather_index = weather_index;
+#else
+  weather_state = weather_resource[weather_index];
+#endif
 
-  if (weather_state == RESOURCE_ID_IMAGE_ALERT
-      || weather_state == RESOURCE_ID_IMAGE_LOCATION
-      || weather_state == RESOURCE_ID_IMAGE_QUERY) {
+  if (weather_index <= 2) {
     if (failures < 3) {
       failures += 1;
       // Ignore up to 3 failures
@@ -161,6 +219,7 @@ void update_weather_conditions_display(uint32_t weather_state) {
   if (weather_state != s_weather_state) {
     s_weather_state = weather_state;
 #ifdef PBL_COLOR
+    set_weather_background(s_weather_state);
 #else
     if (s_conditions_bitmap) {
       gbitmap_destroy(s_conditions_bitmap);
@@ -175,36 +234,34 @@ void update_weather_temperature_display() {
   static char temperature_buffer[8];
 #ifdef PBL_COLOR
   static char temp_scale_value_buffer[3][4];
-#endif
-
-  if (s_weather_state == RESOURCE_ID_IMAGE_ALERT
-      || s_weather_state == RESOURCE_ID_IMAGE_LOCATION
-      || s_weather_state == RESOURCE_ID_IMAGE_QUERY) {
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "?");
+  if (g_temperature_unit == CELSIUS) {
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d C", g_temperature);
   } else {
-    if (g_temperature_unit == CELSIUS) {
-#ifdef PBL_COLOR
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d C", g_temperature);
-#else
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", g_temperature);
-#endif
-    } else {
-      int temperature = (g_temperature * 9 / 5) + 32;
-#ifdef PBL_COLOR
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d F", temperature);
-#else
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
-#endif
-    }
+    int temperature = (g_temperature * 9 / 5) + 32;
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d F", temperature);
   }
   text_layer_set_text(s_temperature_text_layer, temperature_buffer);
-#ifdef PBL_COLOR
+
   for (int i = 0; i < 3; i++) {
     int temp_mark = temp_value[g_temperature_unit][i];
     snprintf(temp_scale_value_buffer[i], sizeof(temp_scale_value_buffer), "%d", temp_mark);
     text_layer_set_text(s_temperature_scale_text_layer[i], temp_scale_value_buffer[i]);
   }
   layer_mark_dirty(s_temperature_layer);
+#else
+  if (s_weather_state == RESOURCE_ID_IMAGE_ALERT
+    || s_weather_state == RESOURCE_ID_IMAGE_LOCATION
+    || s_weather_state == RESOURCE_ID_IMAGE_QUERY) {
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "?");
+  } else {
+    if (g_temperature_unit == CELSIUS) {
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", g_temperature);
+    } else {
+      int temperature = (g_temperature * 9 / 5) + 32;
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", temperature);
+    }
+  }
+  text_layer_set_text(s_temperature_text_layer, temperature_buffer);
 #endif
 }
 
@@ -230,7 +287,7 @@ void update_weather(int update_type) {
   }
   if (update_type == 4 && g_night_time != night_time) {
     night_time = g_night_time;
-    set_weather_background();
+    update_weather_conditions_display(s_weather_index);
   }
 #else
   if (update_type == 0) {

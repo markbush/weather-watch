@@ -81,6 +81,150 @@
         "targetPlatforms": [ "basalt" ]
       },
       {
+        "file": "images/background-day-cloud-broken.png",
+        "name": "IMAGE_BACKGROUND_DAY_CLOUD_BROKEN",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-cloud-broken.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_CLOUD_BROKEN",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-cloud-few.png",
+        "name": "IMAGE_BACKGROUND_DAY_CLOUD_FEW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-cloud-few.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_CLOUD_FEW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-cloud-scattered.png",
+        "name": "IMAGE_BACKGROUND_DAY_CLOUD_SCATTERED",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-cloud-scattered.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_CLOUD_SCATTERED",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-mist.png",
+        "name": "IMAGE_BACKGROUND_DAY_MIST",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-mist.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_MIST",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-rain-heavy.png",
+        "name": "IMAGE_BACKGROUND_DAY_RAIN_HEAVY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-rain-heavy.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_RAIN_HEAVY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-rain-light.png",
+        "name": "IMAGE_BACKGROUND_DAY_RAIN_LIGHT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-rain-light.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_RAIN_LIGHT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-snow.png",
+        "name": "IMAGE_BACKGROUND_DAY_SNOW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-snow.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_SNOW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-thunderstorm.png",
+        "name": "IMAGE_BACKGROUND_DAY_THUNDERSTORM",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-thunderstorm.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_THUNDERSTORM",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-wind.png",
+        "name": "IMAGE_BACKGROUND_DAY_WIND",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-wind.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_WIND",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-alert.png",
+        "name": "IMAGE_BACKGROUND_DAY_ALERT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-alert.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_ALERT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-query.png",
+        "name": "IMAGE_BACKGROUND_DAY_QUERY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-query.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_QUERY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-day-location.png",
+        "name": "IMAGE_BACKGROUND_DAY_LOCATION",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/background-night-location.png",
+        "name": "IMAGE_BACKGROUND_NIGHT_LOCATION",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
         "file": "images/temp-scale.png",
         "name": "IMAGE_TEMP_SCALE",
         "type": "png",
@@ -89,17 +233,20 @@
       {
         "file": "images/alert.png",
         "name": "IMAGE_ALERT",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/query.png",
         "name": "IMAGE_QUERY",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/location.png",
         "name": "IMAGE_LOCATION",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/menu.png",
@@ -110,52 +257,62 @@
       {
         "file": "images/weather-clear.png",
         "name": "IMAGE_CLEAR",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-cloud-broken.png",
         "name": "IMAGE_CLOUDS_BROKEN",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-cloud-few.png",
         "name": "IMAGE_CLOUDS_FEW",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-cloud-scattered.png",
         "name": "IMAGE_CLOUDS_SCATTERED",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-mist.png",
         "name": "IMAGE_MIST",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-rain-heavy.png",
         "name": "IMAGE_RAIN_HEAVY",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-rain-light.png",
         "name": "IMAGE_RAIN_LIGHT",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-snow.png",
         "name": "IMAGE_SNOW",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-thunderstorm.png",
         "name": "IMAGE_THUNDERSTORM",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       },
       {
         "file": "images/weather-wind.png",
         "name": "IMAGE_WIND",
-        "type": "png"
+        "type": "png",
+        "targetPlatforms": [ "aplite" ]
       }
     ]
   },

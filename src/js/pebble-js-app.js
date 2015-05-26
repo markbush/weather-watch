@@ -58,7 +58,7 @@ function hourlyForecastCallback(responseText) {
       dictionary['forecastTitle'+i] = date.getHours();
       dictionary['forecastTempMin'+i] = temp;
       dictionary['forecastTempMax'+i] = temp;
-      console.log("[" + date.getHours() + "] " + weather + " " + temp + "C");
+      dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
     console.log("No weather available: " + json.message);
@@ -92,7 +92,7 @@ function dailyForecastCallback(responseText) {
       dictionary['forecastTitle'+i] = date.getDate();
       dictionary['forecastTempMin'+i] = tempMin;
       dictionary['forecastTempMax'+i] = tempMax;
-      console.log("[" + date.getDate() + "] " + weather + " " + tempMin + "C - " + tempMax + "C");
+      dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
     console.log("No weather available: " + json.message);

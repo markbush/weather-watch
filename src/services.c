@@ -10,24 +10,24 @@
 #define KEY_SHOW_TEMP 7
 #define KEY_SHOW_WEATHER 8
 #define KEY_FORECAST_TYPE 9
-#define KEY_G_FORECAST_TITLE_0 10
-#define KEY_G_FORECAST_TITLE_1 11
-#define KEY_G_FORECAST_TITLE_2 12
-#define KEY_G_FORECAST_TITLE_3 13
-#define KEY_G_FORECAST_TITLE_4 14
-#define KEY_G_FORECAST_TITLE_5 15
-#define KEY_G_FORECAST_TEMP_MIN_0 16
-#define KEY_G_FORECAST_TEMP_MIN_1 17
-#define KEY_G_FORECAST_TEMP_MIN_2 18
-#define KEY_G_FORECAST_TEMP_MIN_3 19
-#define KEY_G_FORECAST_TEMP_MIN_4 20
-#define KEY_G_FORECAST_TEMP_MIN_5 21
-#define KEY_G_FORECAST_TEMP_MAX_0 22
-#define KEY_G_FORECAST_TEMP_MAX_1 23
-#define KEY_G_FORECAST_TEMP_MAX_2 24
-#define KEY_G_FORECAST_TEMP_MAX_3 25
-#define KEY_G_FORECAST_TEMP_MAX_4 26
-#define KEY_G_FORECAST_TEMP_MAX_5 27
+#define KEY_FORECAST_TITLE_0 10
+#define KEY_FORECAST_TITLE_1 11
+#define KEY_FORECAST_TITLE_2 12
+#define KEY_FORECAST_TITLE_3 13
+#define KEY_FORECAST_TITLE_4 14
+#define KEY_FORECAST_TITLE_5 15
+#define KEY_FORECAST_TEMP_MIN_0 16
+#define KEY_FORECAST_TEMP_MIN_1 17
+#define KEY_FORECAST_TEMP_MIN_2 18
+#define KEY_FORECAST_TEMP_MIN_3 19
+#define KEY_FORECAST_TEMP_MIN_4 20
+#define KEY_FORECAST_TEMP_MIN_5 21
+#define KEY_FORECAST_TEMP_MAX_0 22
+#define KEY_FORECAST_TEMP_MAX_1 23
+#define KEY_FORECAST_TEMP_MAX_2 24
+#define KEY_FORECAST_TEMP_MAX_3 25
+#define KEY_FORECAST_TEMP_MAX_4 26
+#define KEY_FORECAST_TEMP_MAX_5 27
 #define KEY_FORECAST_WEATHER_0 28
 #define KEY_FORECAST_WEATHER_1 29
 #define KEY_FORECAST_WEATHER_2 30
@@ -41,20 +41,21 @@ extern void update_weather_temperature_display();
 extern void update_battery();
 extern void update_bluetooth();
 extern void update_date_display();
-extern void update_weather();
+extern void update_weather(int update_type);
 #ifdef PBL_COLOR
 extern void get_forecast();
 
 extern int g_forecast_title[6];
 extern int g_forecast_temp_min[6];
 extern int g_forecast_temp_max[6];
+extern int g_forecast_weather[6];
 #endif
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void inbox_dropped_callback(AppMessageResult reason, void *context);
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context);
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context);
-static uint32_t weather_state_for_conditions(uint32_t conditions);
+static int weather_index_for_conditions(uint32_t conditions);
 void setup_remote_services();
 void load_config();
 void save_config();
@@ -126,6 +127,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   int offset;
   bool need_update_1 = false;
   bool need_update_2 = false;
+  bool need_update_3 = false;
   bool need_update_4 = false;
 #endif
 
@@ -140,8 +142,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       break;
     case KEY_CONDITIONS:
       ;
-      uint32_t weather_state = weather_state_for_conditions((uint32_t)t->value->int32);
-      update_weather_conditions_display(weather_state);
+      int weather_index = weather_index_for_conditions((uint32_t)t->value->int32);
+      update_weather_conditions_display(weather_index);
       update_weather_temperature_display();
       break;
     case KEY_TEMP_UNIT:
@@ -183,43 +185,56 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       g_forecast_type = (int)t->value->int32;
       get_forecast();
       break;
-    case KEY_G_FORECAST_TITLE_0:
-    case KEY_G_FORECAST_TITLE_1:
-    case KEY_G_FORECAST_TITLE_2:
-    case KEY_G_FORECAST_TITLE_3:
-    case KEY_G_FORECAST_TITLE_4:
-    case KEY_G_FORECAST_TITLE_5:
+    case KEY_FORECAST_TITLE_0:
+    case KEY_FORECAST_TITLE_1:
+    case KEY_FORECAST_TITLE_2:
+    case KEY_FORECAST_TITLE_3:
+    case KEY_FORECAST_TITLE_4:
+    case KEY_FORECAST_TITLE_5:
       ;
-      offset = t->key - KEY_G_FORECAST_TITLE_0;
+      offset = t->key - KEY_FORECAST_TITLE_0;
       if (g_forecast_title[offset] != (int)t->value->int32) {
         g_forecast_title[offset] = (int)t->value->int32;
         need_update_1 = true;
       }
       break;
-    case KEY_G_FORECAST_TEMP_MIN_0:
-    case KEY_G_FORECAST_TEMP_MIN_1:
-    case KEY_G_FORECAST_TEMP_MIN_2:
-    case KEY_G_FORECAST_TEMP_MIN_3:
-    case KEY_G_FORECAST_TEMP_MIN_4:
-    case KEY_G_FORECAST_TEMP_MIN_5:
+    case KEY_FORECAST_TEMP_MIN_0:
+    case KEY_FORECAST_TEMP_MIN_1:
+    case KEY_FORECAST_TEMP_MIN_2:
+    case KEY_FORECAST_TEMP_MIN_3:
+    case KEY_FORECAST_TEMP_MIN_4:
+    case KEY_FORECAST_TEMP_MIN_5:
       ;
-      offset = t->key - KEY_G_FORECAST_TEMP_MIN_0;
+      offset = t->key - KEY_FORECAST_TEMP_MIN_0;
       if (g_forecast_temp_min[offset] != (int)t->value->int32) {
         g_forecast_temp_min[offset] = (int)t->value->int32;
         need_update_2 = true;
       }
       break;
-    case KEY_G_FORECAST_TEMP_MAX_0:
-    case KEY_G_FORECAST_TEMP_MAX_1:
-    case KEY_G_FORECAST_TEMP_MAX_2:
-    case KEY_G_FORECAST_TEMP_MAX_3:
-    case KEY_G_FORECAST_TEMP_MAX_4:
-    case KEY_G_FORECAST_TEMP_MAX_5:
+    case KEY_FORECAST_TEMP_MAX_0:
+    case KEY_FORECAST_TEMP_MAX_1:
+    case KEY_FORECAST_TEMP_MAX_2:
+    case KEY_FORECAST_TEMP_MAX_3:
+    case KEY_FORECAST_TEMP_MAX_4:
+    case KEY_FORECAST_TEMP_MAX_5:
       ;
-      offset = t->key - KEY_G_FORECAST_TEMP_MAX_0;
+      offset = t->key - KEY_FORECAST_TEMP_MAX_0;
       if (g_forecast_temp_max[offset] != (int)t->value->int32) {
         g_forecast_temp_max[offset] = (int)t->value->int32;
         need_update_2 = true;
+      }
+      break;
+    case KEY_FORECAST_WEATHER_0:
+    case KEY_FORECAST_WEATHER_1:
+    case KEY_FORECAST_WEATHER_2:
+    case KEY_FORECAST_WEATHER_3:
+    case KEY_FORECAST_WEATHER_4:
+    case KEY_FORECAST_WEATHER_5:
+      ;
+      offset = t->key - KEY_FORECAST_WEATHER_0;
+      if (g_forecast_weather[offset] != (int)t->value->int32) {
+        g_forecast_weather[offset] = (int)t->value->int32;
+        need_update_3 = true;
       }
       break;
     case KEY_NIGHT_TIME:
@@ -247,6 +262,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   if (need_update_2) {
     update_weather(2);
   }
+  if (need_update_3) {
+    update_weather(3);
+  }
   if (need_update_4) {
     update_weather(4);
   }
@@ -259,7 +277,7 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed: %d", reason);
-  update_weather_conditions_display(RESOURCE_ID_IMAGE_QUERY);
+  update_weather_conditions_display(0);
   update_weather_temperature_display();
 }
 
@@ -267,40 +285,40 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   //APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
 }
 
-static uint32_t weather_state_for_conditions(uint32_t conditions) {
-  uint32_t weather_state = RESOURCE_ID_IMAGE_ALERT;
+static int weather_index_for_conditions(uint32_t conditions) {
+  int weather_state = 0;
   if (conditions == 0) {
-    weather_state = RESOURCE_ID_IMAGE_ALERT;
+    weather_state = 1;
   } else if (conditions == 1) {
-    weather_state = RESOURCE_ID_IMAGE_LOCATION;
+    weather_state = 2;
   } else if (conditions == 800) {
-    weather_state = RESOURCE_ID_IMAGE_CLEAR;
+    weather_state = 3;
   } else if (conditions == 801) {
-    weather_state = RESOURCE_ID_IMAGE_CLOUDS_FEW;
+    weather_state = 4;
   } else if (conditions == 802) {
-    weather_state = RESOURCE_ID_IMAGE_CLOUDS_SCATTERED;
+    weather_state = 5;
   } else if (conditions == 803 || conditions == 804) {
-    weather_state = RESOURCE_ID_IMAGE_CLOUDS_BROKEN;
+    weather_state = 6;
   } else if (conditions >= 200 && conditions < 300) {
-    weather_state = RESOURCE_ID_IMAGE_THUNDERSTORM;
+    weather_state = 7;
   } else if (conditions >= 300 && conditions < 400) {
-    weather_state = RESOURCE_ID_IMAGE_RAIN_LIGHT;
+    weather_state = 8;
   } else if (conditions == 500 || conditions == 501) {
-    weather_state = RESOURCE_ID_IMAGE_RAIN_LIGHT;
+    weather_state = 8;
   } else if (conditions >= 502 && conditions < 600) {
-    weather_state = RESOURCE_ID_IMAGE_RAIN_HEAVY;
+    weather_state = 9;
   } else if (conditions >= 600 && conditions < 700) {
-    weather_state = RESOURCE_ID_IMAGE_SNOW;
+    weather_state = 10;
   } else if (conditions >= 700 && conditions < 800) {
-    weather_state = RESOURCE_ID_IMAGE_MIST;
+    weather_state = 11;
   } else if (conditions >= 900 && conditions < 906) {
-    weather_state = RESOURCE_ID_IMAGE_WIND;
+    weather_state = 12;
   } else if (conditions == 906) {
-    weather_state = RESOURCE_ID_IMAGE_SNOW;
+    weather_state = 10;
   } else if (conditions >= 951 && conditions < 955) {
-    weather_state = RESOURCE_ID_IMAGE_CLEAR;
+    weather_state = 3;
   } else if (conditions >= 955) {
-    weather_state = RESOURCE_ID_IMAGE_WIND;
+    weather_state = 12;
   }
   return weather_state;
 }
