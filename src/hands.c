@@ -1,11 +1,11 @@
 #include <pebble.h>
 
 extern void update_time(struct tm *tick_time);
-extern struct tm pebble_time;
+extern struct tm g_pebble_time;
 
 static void hands_update_proc(Layer *layer, GContext *ctx);
 
-Layer *s_hands_layer;
+Layer *g_hands_layer;
 
 static GPath *s_minute_hand_path;
 static GPath *s_hour_hand_path;
@@ -44,13 +44,13 @@ static GColor fg;
 
 void setup_hands(Layer *root) {
 #ifdef PBL_COLOR
-  s_hands_layer = layer_create(GRect(0, 0, 144, 144));
+  g_hands_layer = layer_create(GRect(0, 0, 144, 144));
   fg = GColorRed;
 #else
-  s_hands_layer = layer_create(GRect(0, 0, 144, 168));
+  g_hands_layer = layer_create(GRect(0, 0, 144, 168));
   fg = GColorWhite;
 #endif
-  layer_add_child(root, s_hands_layer);
+  layer_add_child(root, g_hands_layer);
 
   s_minute_hand_path = gpath_create(&MINUTE_HAND);
   s_hour_hand_path = gpath_create(&HOUR_HAND);
@@ -62,7 +62,7 @@ void setup_hands(Layer *root) {
   gpath_move_to(s_hour_hand_path, GPoint(72, 84));
 #endif
 
-  layer_set_update_proc(s_hands_layer, hands_update_proc);
+  layer_set_update_proc(g_hands_layer, hands_update_proc);
 
   // Initialise clock
   time_t temp = time(NULL);
@@ -79,14 +79,12 @@ void teardown_hands() {
     gpath_destroy(s_hour_hand_path);
     s_hour_hand_path = NULL;
   }
-  layer_destroy(s_hands_layer);
+  layer_destroy(g_hands_layer);
 }
 
 static void hands_update_proc(Layer *layer, GContext *ctx) {
-  //if (!pebble_time) return;
-
-  int32_t minute_angle = TRIG_MAX_ANGLE * pebble_time.tm_min / 60;
-  int32_t hour_angle = (TRIG_MAX_ANGLE * (((pebble_time.tm_hour % 12) * 6) + (pebble_time.tm_min / 10))) / (12 * 6);
+  int32_t minute_angle = TRIG_MAX_ANGLE * g_pebble_time.tm_min / 60;
+  int32_t hour_angle = (TRIG_MAX_ANGLE * (((g_pebble_time.tm_hour % 12) * 6) + (g_pebble_time.tm_min / 10))) / (12 * 6);
 
   graphics_context_set_fill_color(ctx, fg);
   graphics_context_set_stroke_color(ctx, fg);

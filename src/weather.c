@@ -11,14 +11,14 @@ void update_weather_temperature_display();
 void update_weather();
 void get_weather();
 
-uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
+static uint32_t s_weather_state = RESOURCE_ID_IMAGE_QUERY;
 static TextLayer *s_temperature_text_layer;
-int s_temperature = 0;
-uint32_t s_temperature_unit = CELSIUS;
-int s_temperature_showing = 0;
-int s_weather_showing = 0;
-int s_forecast_type = FORECAST_HOURLY;
-int s_night_time = 0;
+int g_temperature = 0;
+uint32_t g_temperature_unit = CELSIUS;
+int g_temperature_showing = 0;
+int g_weather_showing = 0;
+int g_forecast_type = FORECAST_HOURLY;
+int g_night_time = 0;
 
 #ifdef PBL_COLOR
 void get_forecast();
@@ -46,9 +46,9 @@ int16_t temp_width[144] = {
 GColor temp_colour[13];
 int temp_value[2][3] = {{0, 10, 20}, {30, 50, 70}};
 int temp_scale_y_offset[3] = {123, 73, 23};
-int forecast_title[6];
-int forecast_temp_min[6];
-int forecast_temp_max[6];
+int g_forecast_title[6];
+int g_forecast_temp_min[6];
+int g_forecast_temp_max[6];
 #else
 static BitmapLayer *s_conditions_layer;
 static GBitmap *s_conditions_bitmap;
@@ -182,14 +182,14 @@ void update_weather_temperature_display() {
       || s_weather_state == RESOURCE_ID_IMAGE_QUERY) {
     snprintf(temperature_buffer, sizeof(temperature_buffer), "?");
   } else {
-    if (s_temperature_unit == CELSIUS) {
+    if (g_temperature_unit == CELSIUS) {
 #ifdef PBL_COLOR
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d C", s_temperature);
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d C", g_temperature);
 #else
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", s_temperature);
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", g_temperature);
 #endif
     } else {
-      int temperature = (s_temperature * 9 / 5) + 32;
+      int temperature = (g_temperature * 9 / 5) + 32;
 #ifdef PBL_COLOR
       snprintf(temperature_buffer, sizeof(temperature_buffer), "%d F", temperature);
 #else
@@ -200,7 +200,7 @@ void update_weather_temperature_display() {
   text_layer_set_text(s_temperature_text_layer, temperature_buffer);
 #ifdef PBL_COLOR
   for (int i = 0; i < 3; i++) {
-    int temp_mark = temp_value[s_temperature_unit][i];
+    int temp_mark = temp_value[g_temperature_unit][i];
     snprintf(temp_scale_value_buffer[i], sizeof(temp_scale_value_buffer), "%d", temp_mark);
     text_layer_set_text(s_temperature_scale_text_layer[i], temp_scale_value_buffer[i]);
   }
@@ -212,7 +212,7 @@ void update_weather(int update_type) {
   static int night_time = 0;
 
   if (update_type == 0) {
-    if (s_temperature_showing == 0) {
+    if (g_temperature_showing == 0) {
       layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), false);
     } else {
       layer_set_hidden(text_layer_get_layer(s_temperature_text_layer), true);
@@ -222,19 +222,19 @@ void update_weather(int update_type) {
   static char forecast_title_buffer[6][4];
   for (int i = 0; i < 6; i++) {
     if (update_type == 1) {
-      snprintf(forecast_title_buffer[i], sizeof(forecast_title_buffer), "%d", forecast_title[i]);
+      snprintf(forecast_title_buffer[i], sizeof(forecast_title_buffer), "%d", g_forecast_title[i]);
       text_layer_set_text(s_forecast_text_layer[i], forecast_title_buffer[i]);
     } else if (update_type == 2) {
       layer_mark_dirty(s_forecast_temperature_layer[i]);
     }
   }
-  if (update_type == 4 && s_night_time != night_time) {
-    night_time = s_night_time;
+  if (update_type == 4 && g_night_time != night_time) {
+    night_time = g_night_time;
     set_weather_background();
   }
 #else
   if (update_type == 0) {
-    if (s_weather_showing == 0) {
+    if (g_weather_showing == 0) {
       layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), false);
     } else {
       layer_set_hidden(bitmap_layer_get_layer(s_conditions_layer), true);
@@ -254,8 +254,8 @@ void get_weather() {
 void get_forecast() {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  dict_write_uint8(iter, 0, s_forecast_type);
-  s_forecast_type = 3 - s_forecast_type;
+  dict_write_uint8(iter, 0, g_forecast_type);
+  g_forecast_type = 3 - g_forecast_type;
   app_message_outbox_send();
 }
 
@@ -279,7 +279,7 @@ static int scale_to_index(int scale) {
 }
 
 static void temp_scale_update_proc(Layer *layer, GContext *ctx) {
-  int temp_scale = temp_to_scale(s_temperature);
+  int temp_scale = temp_to_scale(g_temperature);
   for (int i = 0; i < temp_scale; i++) {
     int line_width = temp_width[i];
     if (line_width > 0) {
@@ -293,12 +293,12 @@ static void temp_scale_update_proc(Layer *layer, GContext *ctx) {
 static void forecast_temperature_update_proc(Layer *layer, GContext *ctx) {
   for (int i = 0; i < 6; i++) {
     if (layer == s_forecast_temperature_layer[i]) {
-      int temp_scale = temp_to_scale(forecast_temp_max[i]);
+      int temp_scale = temp_to_scale(g_forecast_temp_max[i]);
       int colour_index = scale_to_index(temp_scale);
       graphics_context_set_fill_color(ctx, temp_colour[colour_index]);
       graphics_fill_rect(ctx, GRect(0, 0, 24, 5), 0, GCornerNone);
 
-      temp_scale = temp_to_scale(forecast_temp_min[i]);
+      temp_scale = temp_to_scale(g_forecast_temp_min[i]);
       colour_index = scale_to_index(temp_scale);
       graphics_context_set_fill_color(ctx, temp_colour[colour_index]);
       graphics_fill_rect(ctx, GRect(0, 5, 24, 5), 0, GCornerNone);

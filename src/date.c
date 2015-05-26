@@ -35,19 +35,19 @@
 void update_date_display();
 void set_date_font();
 
-extern struct tm pebble_time;
+extern struct tm g_pebble_time;
 
 #ifdef PBL_COLOR
 static TextLayer *s_day_layer;
 static TextLayer *s_month_layer;
 #endif
 static TextLayer *s_date_layer;
-GFont s_date_font;
-GFont s_date_font_en;
-GFont s_date_font_gr;
-GFont s_date_font_ru;
-GFont s_date_font_cn;
-int s_locale = LC_EN;
+static GFont s_date_font;
+static GFont s_date_font_en;
+static GFont s_date_font_gr;
+static GFont s_date_font_ru;
+static GFont s_date_font_cn;
+int g_locale = LC_EN;
 static GColor fg;
 
 static char DAY[NUM_LOCALES][7][12] = {
@@ -179,9 +179,9 @@ void update_date_display() {
   static char date_buffer[10];
   static char month_buffer[15];
 
-  char *wday = DAY[s_locale][pebble_time.tm_wday];
-  int mday = pebble_time.tm_mday;
-  char *mon = MONTH[s_locale][pebble_time.tm_mon];
+  char *wday = DAY[g_locale][g_pebble_time.tm_wday];
+  int mday = g_pebble_time.tm_mday;
+  char *mon = MONTH[g_locale][g_pebble_time.tm_mon];
   snprintf(day_date_buffer, sizeof(day_date_buffer), "%s %d %s", wday, mday, mon);
   snprintf(day_buffer, sizeof(day_buffer), "%s", wday);
   snprintf(date_buffer, sizeof(date_buffer), "%d", mday);
@@ -204,7 +204,7 @@ void set_date_font() {
 #else
   GRect frame = GRect(0, 62, 144, 32);
 #endif
-  switch (s_locale) {
+  switch (g_locale) {
   case LC_GR:
     ;
     new_font = s_date_font_gr;

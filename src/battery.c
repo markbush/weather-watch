@@ -23,7 +23,7 @@ void update_battery();
 
 static Layer *s_battery_layer;
 static int s_battery_state = BATTERY_UNKNOWN;
-int s_battery_showing = SHOW_ALWAYS;
+int g_battery_showing = SHOW_ALWAYS;
 
 static GPath *s_battery_path;
 static const GPathInfo BATTERY_ICON = {
@@ -146,7 +146,7 @@ static void battery_changed_callback(BatteryChargeState charge_state) {
 
 void update_battery() {
   bool hidden = false;
-  switch (s_battery_showing) {
+  switch (g_battery_showing) {
   case SHOW_NEVER:
     ;
     hidden = true;
@@ -165,7 +165,7 @@ void update_battery() {
     break;
   default:
     ;
-    int check_level = (10 - s_battery_showing) * 10;
+    int check_level = (10 - g_battery_showing) * 10;
     if (s_battery_state <= check_level) {
       hidden = false;
     } else {

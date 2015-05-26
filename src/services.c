@@ -10,24 +10,24 @@
 #define KEY_SHOW_TEMP 7
 #define KEY_SHOW_WEATHER 8
 #define KEY_FORECAST_TYPE 9
-#define KEY_FORECAST_TITLE_0 10
-#define KEY_FORECAST_TITLE_1 11
-#define KEY_FORECAST_TITLE_2 12
-#define KEY_FORECAST_TITLE_3 13
-#define KEY_FORECAST_TITLE_4 14
-#define KEY_FORECAST_TITLE_5 15
-#define KEY_FORECAST_TEMP_MIN_0 16
-#define KEY_FORECAST_TEMP_MIN_1 17
-#define KEY_FORECAST_TEMP_MIN_2 18
-#define KEY_FORECAST_TEMP_MIN_3 19
-#define KEY_FORECAST_TEMP_MIN_4 20
-#define KEY_FORECAST_TEMP_MIN_5 21
-#define KEY_FORECAST_TEMP_MAX_0 22
-#define KEY_FORECAST_TEMP_MAX_1 23
-#define KEY_FORECAST_TEMP_MAX_2 24
-#define KEY_FORECAST_TEMP_MAX_3 25
-#define KEY_FORECAST_TEMP_MAX_4 26
-#define KEY_FORECAST_TEMP_MAX_5 27
+#define KEY_G_FORECAST_TITLE_0 10
+#define KEY_G_FORECAST_TITLE_1 11
+#define KEY_G_FORECAST_TITLE_2 12
+#define KEY_G_FORECAST_TITLE_3 13
+#define KEY_G_FORECAST_TITLE_4 14
+#define KEY_G_FORECAST_TITLE_5 15
+#define KEY_G_FORECAST_TEMP_MIN_0 16
+#define KEY_G_FORECAST_TEMP_MIN_1 17
+#define KEY_G_FORECAST_TEMP_MIN_2 18
+#define KEY_G_FORECAST_TEMP_MIN_3 19
+#define KEY_G_FORECAST_TEMP_MIN_4 20
+#define KEY_G_FORECAST_TEMP_MIN_5 21
+#define KEY_G_FORECAST_TEMP_MAX_0 22
+#define KEY_G_FORECAST_TEMP_MAX_1 23
+#define KEY_G_FORECAST_TEMP_MAX_2 24
+#define KEY_G_FORECAST_TEMP_MAX_3 25
+#define KEY_G_FORECAST_TEMP_MAX_4 26
+#define KEY_G_FORECAST_TEMP_MAX_5 27
 #define KEY_FORECAST_WEATHER_0 28
 #define KEY_FORECAST_WEATHER_1 29
 #define KEY_FORECAST_WEATHER_2 30
@@ -45,9 +45,9 @@ extern void update_weather();
 #ifdef PBL_COLOR
 extern void get_forecast();
 
-extern int forecast_title[6];
-extern int forecast_temp_min[6];
-extern int forecast_temp_max[6];
+extern int g_forecast_title[6];
+extern int g_forecast_temp_min[6];
+extern int g_forecast_temp_max[6];
 #endif
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
@@ -59,16 +59,16 @@ void setup_remote_services();
 void load_config();
 void save_config();
 
-extern uint32_t s_temperature_unit;
-extern int s_temperature;
-extern int s_battery_showing;
-extern int s_bluetooth_showing;
-extern int s_bluetooth_disconnect;
-extern int s_locale;
-extern int s_temperature_showing;
-extern int s_weather_showing;
-extern int s_forecast_type;
-extern int s_night_time;
+extern uint32_t g_temperature_unit;
+extern int g_temperature;
+extern int g_battery_showing;
+extern int g_bluetooth_showing;
+extern int g_bluetooth_disconnect;
+extern int g_locale;
+extern int g_temperature_showing;
+extern int g_weather_showing;
+extern int g_forecast_type;
+extern int g_night_time;
 
 void setup_remote_services() {
   app_message_register_inbox_received(inbox_received_callback);
@@ -82,40 +82,40 @@ void setup_remote_services() {
 
 void load_config() {
   if (persist_exists(KEY_TEMP_UNIT)) {
-    s_temperature_unit = persist_read_int(KEY_TEMP_UNIT);
+    g_temperature_unit = persist_read_int(KEY_TEMP_UNIT);
   }
   if (persist_exists(KEY_BATTERY)) {
-    s_battery_showing = persist_read_int(KEY_BATTERY);
+    g_battery_showing = persist_read_int(KEY_BATTERY);
   }
   if (persist_exists(KEY_BLUETOOTH)) {
-    s_bluetooth_showing = persist_read_int(KEY_BLUETOOTH);
+    g_bluetooth_showing = persist_read_int(KEY_BLUETOOTH);
   }
   if (persist_exists(KEY_DISCONNECT)) {
-    s_bluetooth_disconnect = persist_read_int(KEY_DISCONNECT);
+    g_bluetooth_disconnect = persist_read_int(KEY_DISCONNECT);
   }
   if (persist_exists(KEY_LANGUAGE)) {
-    s_locale = persist_read_int(KEY_LANGUAGE);
+    g_locale = persist_read_int(KEY_LANGUAGE);
   }
   if (persist_exists(KEY_SHOW_TEMP)) {
-    s_temperature_showing = persist_read_int(KEY_SHOW_TEMP);
+    g_temperature_showing = persist_read_int(KEY_SHOW_TEMP);
   }
   if (persist_exists(KEY_SHOW_WEATHER)) {
-    s_weather_showing = persist_read_int(KEY_SHOW_WEATHER);
+    g_weather_showing = persist_read_int(KEY_SHOW_WEATHER);
   }
   if (persist_exists(KEY_FORECAST_TYPE)) {
-    s_forecast_type = persist_read_int(KEY_FORECAST_TYPE);
+    g_forecast_type = persist_read_int(KEY_FORECAST_TYPE);
   }
 }
 
 void save_config() {
-  persist_write_int(KEY_TEMP_UNIT, s_temperature_unit);
-  persist_write_int(KEY_BATTERY, s_battery_showing);
-  persist_write_int(KEY_BLUETOOTH, s_bluetooth_showing);
-  persist_write_int(KEY_DISCONNECT, s_bluetooth_disconnect);
-  persist_write_int(KEY_LANGUAGE, s_locale);
-  persist_write_int(KEY_SHOW_TEMP, s_temperature_showing);
-  persist_write_int(KEY_SHOW_WEATHER, s_weather_showing);
-  persist_write_int(KEY_FORECAST_TYPE, s_forecast_type);
+  persist_write_int(KEY_TEMP_UNIT, g_temperature_unit);
+  persist_write_int(KEY_BATTERY, g_battery_showing);
+  persist_write_int(KEY_BLUETOOTH, g_bluetooth_showing);
+  persist_write_int(KEY_DISCONNECT, g_bluetooth_disconnect);
+  persist_write_int(KEY_LANGUAGE, g_locale);
+  persist_write_int(KEY_SHOW_TEMP, g_temperature_showing);
+  persist_write_int(KEY_SHOW_WEATHER, g_weather_showing);
+  persist_write_int(KEY_FORECAST_TYPE, g_forecast_type);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -135,7 +135,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     switch(t->key) {
     case KEY_TEMPERATURE:
       ;
-      s_temperature = (int)t->value->int32;
+      g_temperature = (int)t->value->int32;
       update_weather_temperature_display();
       break;
     case KEY_CONDITIONS:
@@ -145,86 +145,86 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       update_weather_temperature_display();
       break;
     case KEY_TEMP_UNIT:
-      s_temperature_unit = (uint32_t)t->value->int32;
+      g_temperature_unit = (uint32_t)t->value->int32;
       update_weather_temperature_display();
       break;
     case KEY_BATTERY:
       ;
-      s_battery_showing = (int)t->value->int32;
+      g_battery_showing = (int)t->value->int32;
       update_battery();
       break;
     case KEY_BLUETOOTH:
       ;
-      s_bluetooth_showing = (int)t->value->int32;
+      g_bluetooth_showing = (int)t->value->int32;
       update_bluetooth();
       break;
     case KEY_DISCONNECT:
       ;
-      s_bluetooth_disconnect = (int)t->value->int32;
+      g_bluetooth_disconnect = (int)t->value->int32;
       break;
     case KEY_LANGUAGE:
       ;
-      s_locale = (int)t->value->int32;
+      g_locale = (int)t->value->int32;
       update_date_display();
       break;
     case KEY_SHOW_TEMP:
       ;
-      s_temperature_showing = (int)t->value->int32;
+      g_temperature_showing = (int)t->value->int32;
       need_update_0 = true;
       break;
     case KEY_SHOW_WEATHER:
       ;
-      s_weather_showing = (int)t->value->int32;
+      g_weather_showing = (int)t->value->int32;
       need_update_0 = true;
       break;
 #ifdef PBL_COLOR
     case KEY_FORECAST_TYPE:
       ;
-      s_forecast_type = (int)t->value->int32;
+      g_forecast_type = (int)t->value->int32;
       get_forecast();
       break;
-    case KEY_FORECAST_TITLE_0:
-    case KEY_FORECAST_TITLE_1:
-    case KEY_FORECAST_TITLE_2:
-    case KEY_FORECAST_TITLE_3:
-    case KEY_FORECAST_TITLE_4:
-    case KEY_FORECAST_TITLE_5:
+    case KEY_G_FORECAST_TITLE_0:
+    case KEY_G_FORECAST_TITLE_1:
+    case KEY_G_FORECAST_TITLE_2:
+    case KEY_G_FORECAST_TITLE_3:
+    case KEY_G_FORECAST_TITLE_4:
+    case KEY_G_FORECAST_TITLE_5:
       ;
-      offset = t->key - KEY_FORECAST_TITLE_0;
-      if (forecast_title[offset] != (int)t->value->int32) {
-        forecast_title[offset] = (int)t->value->int32;
+      offset = t->key - KEY_G_FORECAST_TITLE_0;
+      if (g_forecast_title[offset] != (int)t->value->int32) {
+        g_forecast_title[offset] = (int)t->value->int32;
         need_update_1 = true;
       }
       break;
-    case KEY_FORECAST_TEMP_MIN_0:
-    case KEY_FORECAST_TEMP_MIN_1:
-    case KEY_FORECAST_TEMP_MIN_2:
-    case KEY_FORECAST_TEMP_MIN_3:
-    case KEY_FORECAST_TEMP_MIN_4:
-    case KEY_FORECAST_TEMP_MIN_5:
+    case KEY_G_FORECAST_TEMP_MIN_0:
+    case KEY_G_FORECAST_TEMP_MIN_1:
+    case KEY_G_FORECAST_TEMP_MIN_2:
+    case KEY_G_FORECAST_TEMP_MIN_3:
+    case KEY_G_FORECAST_TEMP_MIN_4:
+    case KEY_G_FORECAST_TEMP_MIN_5:
       ;
-      offset = t->key - KEY_FORECAST_TEMP_MIN_0;
-      if (forecast_temp_min[offset] != (int)t->value->int32) {
-        forecast_temp_min[offset] = (int)t->value->int32;
+      offset = t->key - KEY_G_FORECAST_TEMP_MIN_0;
+      if (g_forecast_temp_min[offset] != (int)t->value->int32) {
+        g_forecast_temp_min[offset] = (int)t->value->int32;
         need_update_2 = true;
       }
       break;
-    case KEY_FORECAST_TEMP_MAX_0:
-    case KEY_FORECAST_TEMP_MAX_1:
-    case KEY_FORECAST_TEMP_MAX_2:
-    case KEY_FORECAST_TEMP_MAX_3:
-    case KEY_FORECAST_TEMP_MAX_4:
-    case KEY_FORECAST_TEMP_MAX_5:
+    case KEY_G_FORECAST_TEMP_MAX_0:
+    case KEY_G_FORECAST_TEMP_MAX_1:
+    case KEY_G_FORECAST_TEMP_MAX_2:
+    case KEY_G_FORECAST_TEMP_MAX_3:
+    case KEY_G_FORECAST_TEMP_MAX_4:
+    case KEY_G_FORECAST_TEMP_MAX_5:
       ;
-      offset = t->key - KEY_FORECAST_TEMP_MAX_0;
-      if (forecast_temp_max[offset] != (int)t->value->int32) {
-        forecast_temp_max[offset] = (int)t->value->int32;
+      offset = t->key - KEY_G_FORECAST_TEMP_MAX_0;
+      if (g_forecast_temp_max[offset] != (int)t->value->int32) {
+        g_forecast_temp_max[offset] = (int)t->value->int32;
         need_update_2 = true;
       }
       break;
     case KEY_NIGHT_TIME:
       ;
-      s_night_time = (int)t->value->int32;
+      g_night_time = (int)t->value->int32;
       need_update_4 = true;
       break;
 #endif

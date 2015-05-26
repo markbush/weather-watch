@@ -21,7 +21,7 @@ static void setup_background(Layer *root);
 static void teardown_background();
 
 void set_weather_background();
-extern int s_night_time;
+extern int g_night_time;
 
 static Window *s_main_window;
 static BitmapLayer *s_background_layer;
@@ -82,7 +82,7 @@ void set_weather_background() {
   if (s_background_bitmap) {
     gbitmap_destroy(s_background_bitmap);
   }
-  if (s_night_time) {
+  if (g_night_time) {
     s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_CLEAR);
   } else {
     s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR);

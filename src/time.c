@@ -5,13 +5,12 @@ extern void get_weather();
 #ifdef PBL_COLOR
 extern void get_forecast();
 #endif
-extern Layer *s_hands_layer;
-extern TextLayer *s_date_layer;
+extern Layer *g_hands_layer;
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed);
 void update_time(struct tm *tick_time);
 
-struct tm pebble_time;
+struct tm g_pebble_time;
 
 void setup_time_service() {
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
@@ -33,9 +32,9 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 void update_time(struct tm *tick_time) {
-  memcpy(&pebble_time, tick_time, sizeof(struct tm));
+  memcpy(&g_pebble_time, tick_time, sizeof(struct tm));
   //pebble_time = tick_time;
 
-  layer_mark_dirty(s_hands_layer);
+  layer_mark_dirty(g_hands_layer);
   update_date_display();
 }

@@ -14,9 +14,9 @@ static void bluetooth_changed_callback(bool connected);
 void update_bluetooth();
 
 static Layer *s_bluetooth_layer;
-uint8_t s_bluetooth_state = BLUETOOTH_UNKNOWN;
-int s_bluetooth_showing = 0;
-int s_bluetooth_disconnect = DISCONNECT_NO_ACTION;
+static uint8_t s_bluetooth_state = BLUETOOTH_UNKNOWN;
+int g_bluetooth_showing = 0;
+int g_bluetooth_disconnect = DISCONNECT_NO_ACTION;
 
 static GPath *s_bluetooth_path;
 static const GPathInfo BLUETOOTH_ICON = {
@@ -75,8 +75,8 @@ static void bluetooth_changed_callback(bool connected) {
     s_bluetooth_state = new_bluetooth_state;
     update_bluetooth();
     layer_mark_dirty(s_bluetooth_layer);
-    if (s_bluetooth_state == BLUETOOTH_DISCONNECTED && s_bluetooth_disconnect != DISCONNECT_NO_ACTION) {
-      switch (s_bluetooth_disconnect) {
+    if (s_bluetooth_state == BLUETOOTH_DISCONNECTED && g_bluetooth_disconnect != DISCONNECT_NO_ACTION) {
+      switch (g_bluetooth_disconnect) {
       case DISCONNECT_SHORT:
         vibes_short_pulse();
         break;
@@ -92,7 +92,7 @@ static void bluetooth_changed_callback(bool connected) {
 }
 
 void update_bluetooth() {
-  if (s_bluetooth_showing == 0) {
+  if (g_bluetooth_showing == 0) {
     layer_set_hidden(s_bluetooth_layer, false);
   } else {
     layer_set_hidden(s_bluetooth_layer, true);
