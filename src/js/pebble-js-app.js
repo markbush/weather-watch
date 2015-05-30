@@ -8,9 +8,11 @@ function xhrRequest(url, type, callback) {
 }
 
 var config_url = 'http://markbush.github.io/weather-watch/';
+var forecastType = 1;
 var config = {};
 var sunrise = 0;
 var sunset = 0;
+var DAY = 24 * 60 * 60;
 
 function weatherCallback(responseText) {
   var json = {};
@@ -62,7 +64,8 @@ function hourlyForecastCallback(responseText) {
       dictionary['forecastTitle'+i] = date.getHours();
       dictionary['forecastTempMin'+i] = temp;
       dictionary['forecastTempMax'+i] = temp;
-      if (item.dt <= sunrise || item.dt >= sunset) {
+      if (item.dt <= sunrise ||
+          (item.dt >= sunset && item.dt <= (sunrise + DAY))) {
         weather += 1000;
       }
       dictionary['forecastWeather'+i] = weather;
@@ -192,7 +195,7 @@ Pebble.addEventListener('ready',
 
     // Get the initial weather
     getWeather();
-    getForecast();
+    getForecast(forecastType);
   }
 );
 
@@ -205,7 +208,8 @@ Pebble.addEventListener('appmessage',
       getWeather();
     } else {
       //console.log('Getting forecast');
-      getForecast(e.payload['0']);
+      forecastType = e.payload['0'];
+      getForecast(forecastType);
     }
   }
 );
@@ -215,10 +219,13 @@ Pebble.addEventListener("showConfiguration", function(e) {
 });
 
 Pebble.addEventListener('webviewclosed', function (e) {
-  console.log("Config result: " + e.response);
+  //console.log("Config result: " + e.response);
 
     if ((typeof e.response === 'string') && (e.response.length > 0)) {
         config = JSON.parse(e.response);
+        if (typeof config.forecastType !== "undefined") {
+          forecastType = config.forecastType;
+        }
 
         // Store it locally
         window.localStorage.setItem('weatherWatch', e.response);
