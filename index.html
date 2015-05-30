@@ -12,6 +12,9 @@
     h1 {
       text-align: center;
     }
+    h2 {
+      text-align: center;
+    }
     .card {
       background: #ffffff;
       font-size: 18px;
@@ -163,6 +166,18 @@
         </select>
       </div>
     </div>
+    <h2>Colour Pebble Options</h2>
+    <div class="card">
+      <div class="label">
+        Forecast Type:
+      </div>
+      <div class="input">
+        <select id="forecastType">
+          <option value="0">Hourly</option>
+          <option value="1">Daily</option>
+        </select>
+      </div>
+    </div>
     <div class="card">
       <button type="submit" id="submit" class="submit card">Save Settings</button>
     </div>
@@ -178,6 +193,7 @@
           if (typeof config.bluetooth === "undefined") config.bluetooth = 0;
           if (typeof config.disconnect === "undefined") config.disconnect = 0;
           if (typeof config.language === "undefined") config.language = 7;
+          if (typeof config.forecastType === "undefined") config.forecastType = 0;
           $('#temperatureUnit').val(config.temperatureUnit);
           $('#battery').val(config.battery);
           $('#showTemperature').val(config.showTemperature);
@@ -185,6 +201,7 @@
           $('#bluetooth').val(config.bluetooth);
           $('#disconnect').val(config.disconnect);
           $('#language').val(config.language);
+          $('#forecastType').val(config.forecastType);
         }
       }
     });
@@ -197,6 +214,7 @@
       config.bluetooth = $('#bluetooth').val() - 0;
       config.disconnect = $('#disconnect').val() - 0;
       config.language = $('#language').val() - 0;
+      config.forecastType = $('#forecastType').val() - 0;
       var store = JSON.stringify(config);
       var options = encodeURIComponent(store);
       if (typeof window.localStorage !== "undefined") {
