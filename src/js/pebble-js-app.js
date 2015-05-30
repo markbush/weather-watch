@@ -27,6 +27,9 @@ function weatherCallback(responseText) {
     dictionary.conditions = json.weather[0].id;
     var nightTime = 1;
     var now = Math.round((new Date()).getTime() / 1000);
+    if (sunrise == 0) {
+      getForecast(forecastType);
+    }
     sunrise = json.sys.sunrise;
     sunset = json.sys.sunset;
     if (now >= json.sys.sunrise && now <= json.sys.sunset) {
@@ -195,7 +198,6 @@ Pebble.addEventListener('ready',
 
     // Get the initial weather
     getWeather();
-    getForecast(forecastType);
   }
 );
 
