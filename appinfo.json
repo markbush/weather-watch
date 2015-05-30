@@ -225,6 +225,162 @@
         "targetPlatforms": [ "basalt" ]
       },
       {
+        "file": "images/forecast-day-clear.png",
+        "name": "IMAGE_FORECAST_DAY_CLEAR",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-clear.png",
+        "name": "IMAGE_FORECAST_NIGHT_CLEAR",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-cloud-broken.png",
+        "name": "IMAGE_FORECAST_DAY_CLOUD_BROKEN",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-cloud-broken.png",
+        "name": "IMAGE_FORECAST_NIGHT_CLOUD_BROKEN",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-cloud-few.png",
+        "name": "IMAGE_FORECAST_DAY_CLOUD_FEW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-cloud-few.png",
+        "name": "IMAGE_FORECAST_NIGHT_CLOUD_FEW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-cloud-scattered.png",
+        "name": "IMAGE_FORECAST_DAY_CLOUD_SCATTERED",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-cloud-scattered.png",
+        "name": "IMAGE_FORECAST_NIGHT_CLOUD_SCATTERED",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-mist.png",
+        "name": "IMAGE_FORECAST_DAY_MIST",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-mist.png",
+        "name": "IMAGE_FORECAST_NIGHT_MIST",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-rain-heavy.png",
+        "name": "IMAGE_FORECAST_DAY_RAIN_HEAVY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-rain-heavy.png",
+        "name": "IMAGE_FORECAST_NIGHT_RAIN_HEAVY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-rain-light.png",
+        "name": "IMAGE_FORECAST_DAY_RAIN_LIGHT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-rain-light.png",
+        "name": "IMAGE_FORECAST_NIGHT_RAIN_LIGHT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-snow.png",
+        "name": "IMAGE_FORECAST_DAY_SNOW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-snow.png",
+        "name": "IMAGE_FORECAST_NIGHT_SNOW",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-thunderstorm.png",
+        "name": "IMAGE_FORECAST_DAY_THUNDERSTORM",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-thunderstorm.png",
+        "name": "IMAGE_FORECAST_NIGHT_THUNDERSTORM",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-wind.png",
+        "name": "IMAGE_FORECAST_DAY_WIND",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-wind.png",
+        "name": "IMAGE_FORECAST_NIGHT_WIND",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-clear.png",
+        "name": "IMAGE_FORECAST_DAY_ALERT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-clear.png",
+        "name": "IMAGE_FORECAST_NIGHT_ALERT",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-clear.png",
+        "name": "IMAGE_FORECAST_DAY_QUERY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-clear.png",
+        "name": "IMAGE_FORECAST_NIGHT_QUERY",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-day-clear.png",
+        "name": "IMAGE_FORECAST_DAY_LOCATION",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
+        "file": "images/forecast-night-clear.png",
+        "name": "IMAGE_FORECAST_NIGHT_LOCATION",
+        "type": "png",
+        "targetPlatforms": [ "basalt" ]
+      },
+      {
         "file": "images/temp-scale.png",
         "name": "IMAGE_TEMP_SCALE",
         "type": "png",

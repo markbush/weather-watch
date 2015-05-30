@@ -123,6 +123,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // Read first item
   Tuple *t = dict_read_first(iterator);
   bool need_update_0 = false;
+  int weather_index;
 #ifdef PBL_COLOR
   int offset;
   bool need_update_1 = false;
@@ -142,7 +143,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       break;
     case KEY_CONDITIONS:
       ;
-      int weather_index = weather_index_for_conditions((uint32_t)t->value->int32);
+      weather_index = weather_index_for_conditions((uint32_t)t->value->int32);
       update_weather_conditions_display(weather_index);
       update_weather_temperature_display();
       break;
@@ -232,8 +233,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     case KEY_FORECAST_WEATHER_5:
       ;
       offset = t->key - KEY_FORECAST_WEATHER_0;
-      if (g_forecast_weather[offset] != (int)t->value->int32) {
-        g_forecast_weather[offset] = (int)t->value->int32;
+      weather_index = weather_index_for_conditions((uint32_t)t->value->int32);
+      if (g_forecast_weather[offset] != weather_index) {
+        g_forecast_weather[offset] = weather_index;
         need_update_3 = true;
       }
       break;
@@ -287,38 +289,42 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 
 static int weather_index_for_conditions(uint32_t conditions) {
   int weather_state = 0;
+  if (conditions >= 1000) {
+    weather_state = 1000;
+    conditions -= 1000;
+  }
   if (conditions == 0) {
-    weather_state = 1;
+    weather_state += 1;
   } else if (conditions == 1) {
-    weather_state = 2;
+    weather_state += 2;
   } else if (conditions == 800) {
-    weather_state = 3;
+    weather_state += 3;
   } else if (conditions == 801) {
-    weather_state = 4;
+    weather_state += 4;
   } else if (conditions == 802) {
-    weather_state = 5;
+    weather_state += 5;
   } else if (conditions == 803 || conditions == 804) {
-    weather_state = 6;
+    weather_state += 6;
   } else if (conditions >= 200 && conditions < 300) {
-    weather_state = 7;
+    weather_state += 7;
   } else if (conditions >= 300 && conditions < 400) {
-    weather_state = 8;
+    weather_state += 8;
   } else if (conditions == 500 || conditions == 501) {
-    weather_state = 8;
+    weather_state += 8;
   } else if (conditions >= 502 && conditions < 600) {
-    weather_state = 9;
+    weather_state += 9;
   } else if (conditions >= 600 && conditions < 700) {
-    weather_state = 10;
+    weather_state += 10;
   } else if (conditions >= 700 && conditions < 800) {
-    weather_state = 11;
+    weather_state += 11;
   } else if (conditions >= 900 && conditions < 906) {
-    weather_state = 12;
+    weather_state += 12;
   } else if (conditions == 906) {
-    weather_state = 10;
+    weather_state += 10;
   } else if (conditions >= 951 && conditions < 955) {
-    weather_state = 3;
+    weather_state += 3;
   } else if (conditions >= 955) {
-    weather_state = 12;
+    weather_state += 12;
   }
   return weather_state;
 }

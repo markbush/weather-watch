@@ -26,6 +26,8 @@ static GBitmap *s_temperature_scale_bitmap;
 static TextLayer *s_temperature_scale_text_layer[3];
 static TextLayer *s_forecast_text_layer[6];
 static Layer *s_forecast_temperature_layer[6];
+static BitmapLayer *s_forecast_conditions_layer[6];
+static GBitmap *s_forecast_bitmap[6];
 
 extern void set_weather_background(uint32_t background_resource);
 static void temp_scale_update_proc(Layer *layer, GContext *ctx);
@@ -80,6 +82,36 @@ static uint32_t weather_resource_night[13] = {
   RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_SNOW,
   RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_MIST,
   RESOURCE_ID_IMAGE_BACKGROUND_NIGHT_WIND
+};
+static uint32_t forecast_resource_day[13] = {
+  RESOURCE_ID_IMAGE_FORECAST_DAY_QUERY,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_ALERT,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_LOCATION,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_CLEAR,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_CLOUD_FEW,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_CLOUD_SCATTERED,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_CLOUD_BROKEN,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_THUNDERSTORM,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_RAIN_LIGHT,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_RAIN_HEAVY,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_SNOW,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_MIST,
+  RESOURCE_ID_IMAGE_FORECAST_DAY_WIND
+};
+static uint32_t forecast_resource_night[13] = {
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_QUERY,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_ALERT,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_LOCATION,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_CLEAR,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_CLOUD_FEW,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_CLOUD_SCATTERED,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_CLOUD_BROKEN,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_THUNDERSTORM,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_RAIN_LIGHT,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_RAIN_HEAVY,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_SNOW,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_MIST,
+  RESOURCE_ID_IMAGE_FORECAST_NIGHT_WIND
 };
 #else
 static BitmapLayer *s_conditions_layer;
@@ -138,6 +170,9 @@ void setup_weather(Layer *root) {
   }
 
   for (int i = 0; i < 6; i++) {
+    s_forecast_conditions_layer[i] = bitmap_layer_create(GRect((i * 24), 144, 24, 14));
+    layer_add_child(root, bitmap_layer_get_layer(s_forecast_conditions_layer[i]));
+
     s_forecast_temperature_layer[i] = layer_create(GRect((i * 24), 158, 24, 10));
     layer_set_update_proc(s_forecast_temperature_layer[i], forecast_temperature_update_proc);
     layer_add_child(root, s_forecast_temperature_layer[i]);
@@ -184,6 +219,10 @@ void teardown_weather() {
   for (int i = 0; i < 6; i++) {
     text_layer_destroy(s_forecast_text_layer[i]);
     layer_destroy(s_forecast_temperature_layer[i]);
+    bitmap_layer_destroy(s_forecast_conditions_layer[i]);
+    if (s_forecast_bitmap[i]) {
+      gbitmap_destroy(s_forecast_bitmap[i]);
+    }
   }
 #else
   gbitmap_destroy(s_conditions_bitmap);
@@ -282,6 +321,19 @@ void update_weather(int update_type) {
       text_layer_set_text(s_forecast_text_layer[i], forecast_title_buffer[i]);
     } else if (update_type == 2) {
       layer_mark_dirty(s_forecast_temperature_layer[i]);
+    } else if (update_type == 3) {
+      if (s_forecast_bitmap[i]) {
+        gbitmap_destroy(s_forecast_bitmap[i]);
+      }
+      int forecast_resource;
+      int forecast_index = g_forecast_weather[i];
+      if (forecast_index >= 1000) {
+        forecast_resource = forecast_resource_night[forecast_index - 1000];
+      } else {
+        forecast_resource = forecast_resource_day[forecast_index];
+      }
+      s_forecast_bitmap[i] = gbitmap_create_with_resource(forecast_resource);
+      bitmap_layer_set_bitmap(s_forecast_conditions_layer[i], s_forecast_bitmap[i]);
     }
   }
   if (update_type == 4 && g_night_time != night_time) {
@@ -311,7 +363,6 @@ void get_forecast() {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   dict_write_uint8(iter, 0, g_forecast_type);
-  g_forecast_type = 3 - g_forecast_type;
   app_message_outbox_send();
 }
 

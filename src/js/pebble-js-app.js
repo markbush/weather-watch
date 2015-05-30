@@ -9,6 +9,8 @@ function xhrRequest(url, type, callback) {
 
 var config_url = 'http://markbush.github.io/weather-watch/';
 var config = {};
+var sunrise = 0;
+var sunset = 0;
 
 function weatherCallback(responseText) {
   var json = {};
@@ -23,6 +25,8 @@ function weatherCallback(responseText) {
     dictionary.conditions = json.weather[0].id;
     var nightTime = 1;
     var now = Math.round((new Date()).getTime() / 1000);
+    sunrise = json.sys.sunrise;
+    sunset = json.sys.sunset;
     if (now >= json.sys.sunrise && now <= json.sys.sunset) {
       nightTime = 0;
     }
@@ -58,6 +62,9 @@ function hourlyForecastCallback(responseText) {
       dictionary['forecastTitle'+i] = date.getHours();
       dictionary['forecastTempMin'+i] = temp;
       dictionary['forecastTempMax'+i] = temp;
+      if (item.dt <= sunrise || item.dt >= sunset) {
+        weather += 1000;
+      }
       dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
