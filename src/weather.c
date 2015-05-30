@@ -17,7 +17,6 @@ uint32_t g_temperature_unit = CELSIUS;
 int g_temperature_showing = 0;
 int g_weather_showing = 0;
 int g_forecast_type = FORECAST_HOURLY;
-int g_night_time = 0;
 
 #ifdef PBL_COLOR
 void get_forecast();
@@ -49,8 +48,8 @@ int g_forecast_title[6];
 int g_forecast_temp_min[6];
 int g_forecast_temp_max[6];
 int g_forecast_weather[6];
-extern int g_night_time;
-static uint32_t s_weather_state = RESOURCE_ID_IMAGE_BACKGROUND_DAY_CLEAR;
+int g_night_time = 0;
+static uint32_t s_weather_state = RESOURCE_ID_IMAGE_BACKGROUND_DAY_QUERY;
 static int s_weather_index = 0;
 static uint32_t weather_resource_day[13] = {
   RESOURCE_ID_IMAGE_BACKGROUND_DAY_QUERY,
