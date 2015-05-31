@@ -246,7 +246,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       break;
 #endif
     default:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
+      //APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
       break;
     }
 

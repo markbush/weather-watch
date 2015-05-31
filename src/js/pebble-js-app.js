@@ -28,7 +28,7 @@ function weatherCallback(responseText) {
     var nightTime = 1;
     var now = Math.round((new Date()).getTime() / 1000);
     if (sunrise == 0) {
-      getForecast(forecastType);
+      getForecast();
     }
     sunrise = json.sys.sunrise;
     sunset = json.sys.sunset;
@@ -55,9 +55,7 @@ function hourlyForecastCallback(responseText) {
   try {
     json = JSON.parse(responseText);
   } catch (e) { }
-  var dictionary = {
-    "conditions": 0
-  };
+  var dictionary = { };
   if (typeof json.list !== 'undefined') {
     for (var i = 0; i < 6; i++) {
       var item = json.list[i];
@@ -92,9 +90,7 @@ function dailyForecastCallback(responseText) {
   try {
     json = JSON.parse(responseText);
   } catch (e) { }
-  var dictionary = {
-    "conditions": 0
-  };
+  var dictionary = { };
   if (typeof json.list !== 'undefined') {
     for (var i = 0; i < 6; i++) {
       var item = json.list[i];
@@ -179,7 +175,7 @@ function getWeather() {
   );
 }
 
-function getForecast(forecastType) {
+function getForecast() {
   var successCallback = hourlyForecastLocationSuccess;
   if (forecastType == 2) {
     successCallback = dailyForecastLocationSuccess;
@@ -211,7 +207,7 @@ Pebble.addEventListener('appmessage',
     } else {
       //console.log('Getting forecast');
       forecastType = e.payload['0'];
-      getForecast(forecastType);
+      getForecast();
     }
   }
 );
