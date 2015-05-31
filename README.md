@@ -35,4 +35,4 @@ There are a number of configuration items available:
 
 You can select to view the date in one of the following languages: Bulgarian, Byelorussian, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Icelandic, Italian, Japanese, Lithuanian, Norwegian, Polish, Portuguese, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Turkish, Ukranian
 
-![Weather Watch](http://pblweb.com/badge/550f3186e0b81d4f1a000044/orange/medium)
+[![Weather Watch](http://pblweb.com/badge/550f3186e0b81d4f1a000044/orange/medium)](https://apps.getpebble.com/applications/550f3186e0b81d4f1a000044 "Weather Watch")
