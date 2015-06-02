@@ -60,6 +60,8 @@ void setup_remote_services();
 void load_config();
 void save_config();
 
+static int s_send_failures = 0;
+
 extern uint32_t g_temperature_unit;
 extern int g_temperature;
 extern int g_battery_showing;
@@ -120,6 +122,7 @@ void save_config() {
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
+  s_send_failures = 0;
   // Read first item
   Tuple *t = dict_read_first(iterator);
   bool need_update_0 = false;
@@ -279,11 +282,16 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed: %d", reason);
-  update_weather_conditions_display(0);
-  update_weather_temperature_display();
+  if (s_send_failures < 3) {
+    s_send_failures += 1;
+  } else {
+    update_weather_conditions_display(0);
+    update_weather_temperature_display();
+  }
 }
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
+  s_send_failures = 0;
   //APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
 }
 

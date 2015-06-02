@@ -1,10 +1,15 @@
 function xhrRequest(url, type, callback) {
+  //log("URL: " + url);
   var xhr = new XMLHttpRequest();
   xhr.onload = function () {
     callback(this.responseText);
   };
   xhr.open(type, url);
   xhr.send();
+}
+
+function log(message) {
+  console.log("[" + (new Date()) + "] " + message);
 }
 
 var config_url = 'http://markbush.github.io/weather-watch/';
@@ -27,7 +32,7 @@ function weatherCallback(responseText) {
     dictionary.conditions = json.weather[0].id;
     var nightTime = 1;
     var now = Math.round((new Date()).getTime() / 1000);
-    if (sunrise == 0) {
+    if (sunrise === 0) {
       getForecast();
     }
     sunrise = json.sys.sunrise;
@@ -37,15 +42,15 @@ function weatherCallback(responseText) {
     }
     dictionary.nightTime = nightTime;
   } else if (json.message) {
-    console.log("No weather available: " + json.message);
+    log("No weather available: " + json.message);
   } else {
-    console.log("Weather not available: " + responseText);
+    log("Weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
     },
     function(e) {
-      console.log("Error sending weather info to Pebble!");
+      log("Error sending weather info to Pebble!");
     }
   );
 }
@@ -72,15 +77,15 @@ function hourlyForecastCallback(responseText) {
       dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
-    console.log("No weather available: " + json.message);
+    log("No weather available: " + json.message);
   } else {
-    console.log("Weather not available: " + responseText);
+    log("Weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
     },
     function(e) {
-      console.log("Error sending weather info to Pebble!");
+      log("Error sending weather info to Pebble!");
     }
   );
 }
@@ -104,15 +109,15 @@ function dailyForecastCallback(responseText) {
       dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
-    console.log("No weather available: " + json.message);
+    log("No weather available: " + json.message);
   } else {
-    console.log("Weather not available: " + responseText);
+    log("Weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
     },
     function(e) {
-      console.log("Error sending weather info to Pebble!");
+      log("Error sending weather info to Pebble!");
     }
   );
 }
@@ -123,7 +128,7 @@ function locationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //console.log("URL: " + url);
+  //log("URL: " + url);
   xhrRequest(url, 'GET', weatherCallback);
 }
 
@@ -133,7 +138,7 @@ function hourlyForecastLocationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //console.log("URL: " + url);
+  //log("URL: " + url);
   xhrRequest(url, 'GET', hourlyForecastCallback);
 }
 
@@ -143,18 +148,21 @@ function dailyForecastLocationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //console.log("URL: " + url);
+  //log("URL: " + url);
   xhrRequest(url, 'GET', dailyForecastCallback);
 }
 
 function locationError(err) {
-  var errMsg = err.message;
-  if (err.code == err.PERMISSION_DENIED) {
-    errMsg = 'Location services denied';
-  } else if (err.code == err.POSITION_UNAVAILABLE) {
-    errMsg = 'Location not available';
+  var errMsg = "Unknown Error";
+  if (typeof err !== "undefined") {
+    errMsg = err.message;
+    if (err.code == err.PERMISSION_DENIED) {
+      errMsg = 'Location services denied';
+    } else if (err.code == err.POSITION_UNAVAILABLE) {
+      errMsg = 'Location not available';
+    }
   }
-  console.log("Error requesting location: " + errMsg);
+  log("Error requesting location: " + errMsg);
   var dictionary = {
     "conditions": 1
   };
@@ -162,7 +170,7 @@ function locationError(err) {
     function(e) {
     },
     function(e) {
-      console.log("Error sending location error to Pebble!");
+      log("Error sending location error to Pebble!");
     }
   );
 }
@@ -180,6 +188,7 @@ function getForecast() {
   if (forecastType == 2) {
     successCallback = dailyForecastLocationSuccess;
   }
+  //log("Forecast type: " + forecastType);
   navigator.geolocation.getCurrentPosition(
     successCallback,
     locationError,
@@ -190,7 +199,7 @@ function getForecast() {
 // Listen for when the watchface is opened
 Pebble.addEventListener('ready',
   function(e) {
-    console.log("PebbleKit JS ready!");
+    log("PebbleKit JS ready!");
 
     // Get the initial weather
     getWeather();
@@ -200,13 +209,17 @@ Pebble.addEventListener('ready',
 // Listen for when an AppMessage is received
 Pebble.addEventListener('appmessage',
   function(e) {
-    //console.log("AppMessage received: " + JSON.stringify(e));
-    if (e.payload['0'] == 0) {
-      //console.log('Getting weather');
+    //log("AppMessage received: " + JSON.stringify(e));
+    var requestType = e.payload['0'];
+    if (typeof requestType === "undefined") {
+      requestType = e.payload.temperature;
+    }
+    if (requestType === 0) {
+      //log('Getting weather');
       getWeather();
     } else {
-      //console.log('Getting forecast');
-      forecastType = e.payload['0'];
+      //log('Getting forecast');
+      forecastType = requestType;
       getForecast();
     }
   }
@@ -217,7 +230,7 @@ Pebble.addEventListener("showConfiguration", function(e) {
 });
 
 Pebble.addEventListener('webviewclosed', function (e) {
-  //console.log("Config result: " + e.response);
+  //log("Config result: " + e.response);
 
     if ((typeof e.response === 'string') && (e.response.length > 0)) {
         config = JSON.parse(e.response);

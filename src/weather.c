@@ -304,7 +304,9 @@ void update_weather_temperature_display() {
 }
 
 void update_weather(int update_type) {
+#ifdef PBL_COLOR
   static int night_time = 0;
+#endif
 
   if (update_type == 0) {
     if (g_temperature_showing == 0) {
