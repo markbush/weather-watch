@@ -1,9 +1,13 @@
+var APPID = '{OpenWeatherMap APP ID}';
+
 function xhrRequest(url, type, callback) {
-  //log("URL: " + url);
   var xhr = new XMLHttpRequest();
   xhr.onload = function () {
+    //log(this.responseText);
     callback(this.responseText);
   };
+  url = url + '&APPID=' + APPID;
+  //log('URL: ' + url);
   xhr.open(type, url);
   xhr.send();
 }
@@ -42,9 +46,9 @@ function weatherCallback(responseText) {
     }
     dictionary.nightTime = nightTime;
   } else if (json.message) {
-    log("No weather available: " + json.message);
+    log("No current weather available: " + json.message);
   } else {
-    log("Weather not available: " + responseText);
+    log("Current Weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
@@ -77,9 +81,9 @@ function hourlyForecastCallback(responseText) {
       dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
-    log("No weather available: " + json.message);
+    log("No hourly weather available: " + json.message);
   } else {
-    log("Weather not available: " + responseText);
+    log("Hourly weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
@@ -109,9 +113,9 @@ function dailyForecastCallback(responseText) {
       dictionary['forecastWeather'+i] = weather;
     }
   } else if (json.message) {
-    log("No weather available: " + json.message);
+    log("No daily weather available: " + json.message);
   } else {
-    log("Weather not available: " + responseText);
+    log("Daily weather not available: " + responseText);
   }
   Pebble.sendAppMessage(dictionary,
     function(e) {
@@ -128,7 +132,7 @@ function locationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //log("URL: " + url);
+  //log("Current weather URL: " + url);
   xhrRequest(url, 'GET', weatherCallback);
 }
 
@@ -138,7 +142,7 @@ function hourlyForecastLocationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //log("URL: " + url);
+  //log("Hourly forecast URL: " + url);
   xhrRequest(url, 'GET', hourlyForecastCallback);
 }
 
@@ -148,7 +152,7 @@ function dailyForecastLocationSuccess(pos) {
       pos.coords.latitude + "&lon=" + pos.coords.longitude;
 
   // Send request to OpenWeatherMap
-  //log("URL: " + url);
+  //log("Daily forecast URL: " + url);
   xhrRequest(url, 'GET', dailyForecastCallback);
 }
 
